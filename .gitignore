@@ -1,0 +1,14 @@
+# Js dependency management
+node_modules
+package-lock.json
+yarn-error.log
+
+# IDEs
+.idea
+
+# Seeds data
+seeds.js
+seeds-data.js
+
+# Source system information
+# sap_constants # normally this would be ignored but this demo app contains dummy data

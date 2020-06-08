@@ -1,0 +1,26 @@
+{
+    "name": "dataviz-sap-bw-odata-node-express-react",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "install-all": "yarn install && yarn --cwd client install && yarn --cwd server install",
+        "clean": "rm -rf node_modules && rm -rf client/node_modules && rm -rf server/node_modules",
+        "test": "run-s test_server test_client",
+        "test_client": "yarn --cwd client test --watch-all=false",
+        "test_server": "yarn --cwd server test --watch-all=false",
+        "client": "npm run start --prefix client",
+        "server": "npm run start --prefix server",
+        "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+        "start": "npm run dev"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {},
+    "devDependencies": {
+        "concurrently": "^5.2.0",
+        "prettier": "^2.0.5",
+        "pretty-quick": "^2.0.1"
+    }
+}
