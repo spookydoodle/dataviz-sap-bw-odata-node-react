@@ -27,7 +27,12 @@ This document describes three steps required to build a web application on Node.
     1. [oData URL manipulation class](#odata-url-manipulation-class)
     1. [Routes](#routes)
 1. [Set up client React app](#set-up-react-client-app)
-    1. [D3 data viz components](#d3-data-viz-components)
+    1. [Resources](#client-resources)
+    1. [Start scripts](#start-scripts)
+    1. [Proxy](#proxy)
+    1. [Service scripts](#service-scripts)
+    1. [Display results in the app](#display-results-in-the-app)
+1. [D3 data viz components](#d3-data-viz-components)
 
 Step number three which describes setting up the client and building react data visualization components is applicable to any source system.
 
@@ -441,9 +446,9 @@ The use of URL parameters in oData from SAP BW can be very powerful but also a b
 * --**testing**
 
 ### Set up index and app
-**index.js**
+[**index.js**](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/index.js)
 
-The `index.js` script should start the server and should be kept as simple as possible.
+The [`index.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/index.js) script should start the server and should be kept as simple as possible.
 
 ```
 const app = require('./app');
@@ -454,24 +459,23 @@ app.listen(PORT, () => {
 });
 ```
 
-**app.js**
+[**app.js**](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js)
 
-The `app.js` file exposes the app as a library. Here we use the express framework.
+The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) file exposes the app as a library. Here we use the express framework.
 
-In the server folder, install express, body-parser and request. Also add nodemon globally and as a devdependency in order to automatically refresh the application after saving changes.
+In the server folder, install *express*, *body-parser* and *request*. Also add *nodemon* globally and as a devdependency in order to automatically refresh the application after saving changes.
 
 With npm:
-
-`npm i express body-parser request –save`
-
-`npm i –g nodemon –save-dev`
+```
+npm i express body-parser request –save
+npm i –g nodemon –save-dev
+```
 
 Or with yarn:
-
-`yarn add express body-parser request`
-
-`yarn add nodemon –dev`
-
+```
+yarn add express body-parser request
+yarn add nodemon –dev
+```
 
 See `package.json` to view dependencies and add scripts.
 
@@ -498,9 +502,9 @@ See `package.json` to view dependencies and add scripts.
 
 ```
 
-The application can be run by executing the `nodemon index.js` script. Before it is possible to do so, it is required to set up the app.js and routes.
+The application can be run by executing the `nodemon index.js` script. Before it is possible to do so, it is required to set up the `app.js` and routes.
 
-The `app.js` initializes the express application and handles routes. Route files are stored in a separate folder and imported in the `app.js`.
+The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) initializes the express application and handles routes. Route files are stored in a separate folder and imported in the `app.js`.
 
 ```
 var express = require('express'),
@@ -532,7 +536,7 @@ In BW, each object has usually a key and a text property, and each measure has a
 
 In order to restructure data, it is necessary to build a mapping file with query details and a list of expected dimensions and measures. Such file will also allow to keep all metadata in one place, which can be useful especially when the data source structure changes. There are often multiple objects for the same thing in BW and depending on the business use, it might be necessary at some point to use another technical name for the same object. Creation of a mapping file will allow us to do such change only in one place, instead of everywhere in our code. Also, thanks to the restructuring we will be able to access the data using standard JavaScript object names, instead of long technical names from BW. For example to get a *Country* name from the data we can simply refer to `results.country.text`, instead of `results[“A0COUNTRY_T”]`. Using strings everywhere in the code is generally evil.
 
-The mapping file is located in `server/common/sap_constants/queryInfo.js` and contains details as seen below:
+The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) is located in [`/server/common/sap_constants/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) and contains details as seen below:
 
 ```
 const queryInfo = {
@@ -574,7 +578,7 @@ const queryInfo = {
 module.exports = queryInfo;
 ```
 
-The aim here is to re-structure the data from BW to more JavaScript-like API. So to visualize, to change this BW output:
+The aim here is to re-structure the data from BW to a more JavaScript-like API. So to visualize, to change this BW output:
 
 ```
 // yyyymmddhhmmss
@@ -618,10 +622,10 @@ See [Routes](#routes) to see which methods are responsible for this change of JS
 
 ### Credentials
 To access the data the application needs to be connected to the internal network and use credentials of a BW user with sufficient authorizations. Credentials are passed in `Base64` encoded format `username:password`. Use `process.env` to securely store credentials in the deployment environment. 
-In a working version of the app you can use a file stored in the `server/common/sap_constants/credentials.js`, BUT MAKE SURE YOU ADD IT TO THE GITIGNORE FILE. 
+In a working version of the app you can use a file stored in the `/server/common/sap_constants/credentials.js`, BUT MAKE SURE YOU ADD IT TO THE GITIGNORE FILE. 
 
 ### oData URL manipulation class
-Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `server/common/`
+Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `/server/common/`
 
 ### Routes
 See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) from `server/common/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
@@ -643,7 +647,7 @@ const routes = app => {
 }
 ```
 
-See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) method in `server/common`. I will not go into details here but as a result this structure from the `queryInfo.js`:
+See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) method in `/server/common`. I will not go into details here but as a result this structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js):
 ```
 dimensions: {
     country: {
@@ -714,4 +718,106 @@ measures: {
 
 ## Set up React client app
 
-### D3 Data viz components
+### Client resources
+* Resource 1: https://reactjs.org/docs/create-a-new-react-app.html 
+
+### Create react app
+Create an app called *client* inside the main folder.
+```
+npx create-react-app client
+```
+
+### Start scripts
+Go to `package.json` in the main app folder (so outside `/client` and `/server`) and install *concurrently* as we will need it to run both server and client at the same time.
+
+Add below scripts to run the whole application using `npm run dev`.
+```
+"scripts": {
+        "install-all": "yarn install && yarn --cwd client install && yarn --cwd server install",
+        "client": "npm run start --prefix client",
+        "server": "npm run start --prefix server",
+        "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+        "start": "npm run dev"
+    },
+```
+
+### Proxy
+Add proxy for communication between the client and the server in `package.json` in the `/client` folder. 
+This is to resolve CORS errors. The port number must correspond to the port number used on the server, in our example it is 5000.
+```
+    "proxy": "http://localhost:5000",
+```
+
+### Service scripts
+We need to define service methods to pull data from our server API to the client. We will use *axios* library to handle that.
+
+Install *axios* in the client and add as a dependency.
+
+```
+npm i axios –-save
+```
+Or with yarn:
+```
+yarn add axios
+```
+
+In the `/client/src` folder, create a folder called *services* and add there a file corresponding to a route file from the server. In this demo app the fille is called [`salesService.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js).
+
+```
+import axios from 'axios';
+
+export default {
+    get: async () => {
+        let res = await axios.get(`/api/sales`);
+        return res.data.results || [];
+    },
+};
+```
+
+### Display results in the app
+To see that the data is passed from BW to server and from server to client, go to [`App.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/App.js) and import the [service file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js). Then add a simple code to display data.
+
+```
+import React, { Component } from 'react';
+import logo from './logo.svg';
+import './App.css';
+import salesService from './services/salesService';
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  componentDidMount() {
+    salesService.get().then(data => this.setState({ data: data }));
+  }
+
+  render() {
+    const { data } = this.state;
+
+    return data ? (
+      <React.Fragment>
+        {data.map(row => <h1>{row.country.text} - {row.sales.value}</h1>)}
+      </React.Fragment>
+    ) : (
+        <React.Fragment>
+          dataviz app
+        </React.Fragment>
+      )
+  }
+}
+
+export default App;
+```
+
+Our API returns:
+
+<img src="/public/images/server-dummy-result.png" width="250"/>
+
+And the app:
+
+<img src="/public/images/client-app-result-1.png" width="250"/>
+
+## D3 Data viz components
