@@ -1,26 +1,32 @@
-import React from 'react';
+import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
+import salesService from './services/salesService';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+    };
+  }
+
+  componentDidMount() {
+    salesService.get().then(data => this.setState({ data: data }));
+  }
+
+  render() {
+    const { data } = this.state;
+
+    return data ? (
+      <React.Fragment>
+        {data.map(row => <h1>{row.country.text} - {row.sales.value}</h1>)}
+      </React.Fragment>
+    ) : (
+        <React.Fragment>
+          dataviz app
+        </React.Fragment>
+      )
+  }
 }
 
 export default App;
