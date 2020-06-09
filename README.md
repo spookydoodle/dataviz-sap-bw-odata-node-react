@@ -39,10 +39,11 @@ Step number three which describes setting up the client and building react data 
 This part of this documentation was written based on below resources as well as own experiences:
 * Resource 1: https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/ 
 * Resource 2: https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query
-* Resource 3: https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
-* Resource 4: https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
-* Resource 5: https://launchpad.support.sap.com/#/notes/2424613 
-* Resource 6: https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
+* Resource 3: https://launchpad.support.sap.com/#/notes/2367553
+* Resource 4: https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
+* Resource 5: https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
+* Resource 6: https://launchpad.support.sap.com/#/notes/2424613 
+* Resource 7: https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
 
 ### SAP Gateway configuration
 This step is only required the first time an oData service is created in the system. 
@@ -76,7 +77,7 @@ Create a BW query and tick the option *Remote Access By oData*.
 <img src="/public/images/query.png" width="500"/>
 
 **Limitations and query functionalities**
-* There are some limitations when building a query for oData service, for example: no hierarchies and no structures allowed
+* There are some limitations when building a query for oData service, for example: no multiple hierarchies and no additional structures allowed
 * Majority of functionalities, such as: currency conversion, display settings and conditions, are processed correctly (see SAP note [2367553](https://launchpad.support.sap.com/#/notes/2367553) ODataQuery features and limitation).
 
 **Query variables**
@@ -94,9 +95,43 @@ Create a BW query and tick the option *Remote Access By oData*.
     * *Display* setting *Key / Text / Key and Text* has impact on the number of generated key-value pairs. Selecting *Key and Text* will generate two separate object properties while only *Key* or only *Text*, one.
     * *Text Output Format* setting *Short/Medium/Long Text* is reflected in the JSON output
     * Setting *Show Result Rows* to *Always* will generate objects with result rows which could be desired, but could also lead to duplication of numbers in the client app, depending on how the data is used there. Think ahead and make sure you use the right setting here.
+* Order of characteristics is the one defined during the designtime (not sure what that means exactly tbh) and it cannot be changed any way, which is very annoying. Order might matter when making use of result rows or in some special scenarios like exception aggregation. For example accumulative sum along rows. Probably it's safer to just accumulate values using javascript data operations on raw data from a query.
 
 **Key Figure settings**
 *	Measures generate two JSON properties for the value (one raw and one formatted) and optionally one for the measure unit. You can make use of measure formatting from the query such as decimals or scaling factor.  
+* Technical names of formulas and selections - make your life easier by adding a technical name to all key figures (local formulas or selections). They impact property names in result JSON. If you don't add them, the property name will be equal to the technical name of base key figure or restricted/calculated key figure used in the key figure structure. If there are several selections in the query with the same KF/CKF/RKF, then the property name will be equal to the 25-character-long UID (visible in Outline panel in BWMT) (or maybe even will result in an error). So keep in mind that the name might change, therefore it is advised to add a local technical name and to not ever modify it.
+
+<img src="/public/images/key-figure-name.png" width="500"/>
+
+```
+// YYYYMMDDHHSS
+// http://<server_name>:<port_number>/sap/opu/odata/sap/<service_name>/<query_name>Results
+
+{
+  "d": {
+    "results": [
+      {
+        "__metadata": {
+          "id": "http://<server_name>:<port_number>/sap/opu/odata/sap/<service_name>/<query_name>Results('V2.86.221.32_1.2.2.0%3A6.2.2.3.15.8.0.13.2.72.2.2.4.3.3.2.25.10.0.2.9.6.10.10.2.3.0.X.1.1.1.1.1.1.1.1_IEQ...')",
+          "uri": "http://<server_name>:<port_number>/sap/opu/odata/sap/<service_name>/<query_name>Results('V2.86.221.32_1.2.2.0%3A6.2.2.3.15.8.0.13.2.72.2.2.4.3.3.2.25.10.0.2.9.6.10.10.2.3.0.X.1.1.1.1.1.1.1.1_IEQ...')",
+          "type": "<service_name>.<query_name>Result"
+        },
+        "ID": "V2.86.221.32_1.2.2.0:6.2.2.3.15.8.0.13.2.72.2.2.4.3.3.2.25.10.0.2.9.6.10.10.2.3.0.X.1.1.1.1.1.1.1.1_IEQck2017116265886Description Red...",
+        "TotaledProperties": "",
+        "A0CALWEEK": "201711",
+        "A0CALWEEK_T": "11.2017",
+        "MY_TECH_NAME": "8",
+        "MY_TECH_NAME_F": "8",
+        "Parameters": {
+          "__deferred": {
+            "uri": "http://<server_name>:<port_number>/sap/opu/odata/sap/<service_name>/<query_name>Results(...)/Parameters"
+          }
+        }
+      }
+    ]
+  }
+}
+```
 
 ### Generate native Gateway service
 It might be necessary to run this standard SAP function module which performs *generate native Gateway service* functionality, if the service is not available automatically after creating a query.
