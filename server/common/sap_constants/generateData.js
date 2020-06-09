@@ -537,7 +537,9 @@ const months = {
 
 
 // Create sales data in JSON format for n countries in all divisions and months
-const createData = n => {
+const generateData = n => {
+    // Adjust n if larger than expected
+    n = n > countryCodes.length ? countryCodes.length : n
     const data = new Array();
     const randInts = generateRandomArr(n, countryCodes.length)
     
@@ -559,11 +561,15 @@ const createData = n => {
                         key: month,
                         text: months[month],
                     },
+                    year: {
+                        key: "2019",
+                        text: "2019",
+                    },
                     qty: {
-                        value: (Math.floor(Math.random() * 100000)),
+                        value: randInt(randInt(randInt(randInt(1000)))),
                     },
                     sales: {
-                        value: (Math.random() * 1000000).toFixed(2),
+                        value: (randInt(randInt(randInt(randInt(1000000))))).toFixed(2),
                         unit: currencies[countryCode] ? currencies[countryCode] : "USD"
                     }
                 })
@@ -572,20 +578,21 @@ const createData = n => {
         })
     })
 
-    console.log(data[0])
-
     return data;
 }
 
-// Create an array of 20 random unique numbers to use to select random countries
-const generateRandomArr = (length, maxValue) => {
+const randInt = n => Math.floor(Math.random() * n)
+
+// Create an array of n random unique numbers greater or equal 0 
+// and smaller than 'lessThanN' to use to select random countries
+const generateRandomArr = (n, lessThanN) => {
     let arr = [];
-    while (arr.length < 20) {
-        let n = Math.floor(Math.random() * countryCodes.length);
-        if (arr.indexOf(n) === -1) arr.push(n);
+    while (arr.length < n) {
+        let r = Math.floor(Math.random() * lessThanN);
+        if (arr.indexOf(r) === -1) arr.push(r);
     }
 
     return arr;
 }
 
-module.exports = createData;
+module.exports = generateData;
