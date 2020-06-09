@@ -19,7 +19,7 @@ class App extends Component {
 
     return data ? (
       <React.Fragment>
-        {data.map(row => <h1>{row.country.text} - {row.sales.value}</h1>)}
+        {data ? data.map((row, i) => <h1 key={i}>{row.country.text} - {row.division.text} - {row.month.text} -{row.sales.value}</h1>) : null}
       </React.Fragment>
     ) : (
         <React.Fragment>

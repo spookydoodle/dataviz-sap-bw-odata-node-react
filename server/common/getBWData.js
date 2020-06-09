@@ -38,7 +38,7 @@ const getBWData = (
                 if (error) {
                     // If URL is not found, for demo purposes send a JSON with dummy data (you may delete this in your app)
                     error.code === "ENOTFOUND" ?
-                        res.status(200).send({ info: "This is dummy data for demo purposes", results: dummyData })
+                        res.status(200).send({ info: "This is dummy data for demo purposes", results: dummyData(20) })
                         : res.status(500).send({ error: "Error retrieving data", message: error })
                 } else if (response.statusCode == 200) {
                     if (csrfToken) {
