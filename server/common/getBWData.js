@@ -25,31 +25,48 @@ const getBWData = (
                 "x-csrf-token": "Fetch"
             }
         }
-            , (error, response, body) => {
-                // csrfToken should be stored in order to do post requests. Not needed in this app.
-                const csrfToken = response.headers['x-csrf-token'];
-                const bodyJSON = JSON.parse(body);
+            , (err, response, body) => {
+                let csrfToken = undefined;
 
-                if (err) {
-                    res.status(500).send({ error: err, res: response, body: bodyJSON })
+                // If wrong url provided, fill API with dummy data for demo purposes
+                if (err && err.code === "ENOTFOUND") {
+                    res.status(200).send({ info: "This is dummy data for demo purposes", results: generateData(20) })
+                }
+                // If any other error, pass the error message as it is
+                else if (err) {
+                    res.status(500).send({ error: err, res: response, body: body })
 
+                    // Successful request. Transform data to match expected JSON format defined in /common/sap_constants/queryInfo
                 } else if (response.statusCode == 200) {
+                    csrfToken = response.headers['x-csrf-token']; // csrfToken should be stored in order to do post requests. Not needed in this app.
                     res.status(response.statusCode)
-                        .send(bodyJSON.d.results.map(resultRow => createObj(sourceJSON, resultRow)))
+                        .send(JSON.parse(body).d.results.map(resultRow => createObj(sourceJSON, resultRow)))
+
+                    // Either wrong username or password or account locked after providing a wrong password more than three times
+                } else if (response.statusCode == 401) {
+                    res.status(response.statusCode).send({
+                        error: "User does not have authorization or account locked due to incorrect logon attempts.",
+                        response: response,
+                        body: body
+                    })
+                    // Bad requests such as requesting a non existing column or misspelled technical name, wrong value passed in query string
+                } else if (response.statusCode == 404) {
+                    res.status(response.statusCode).send({
+                        error: JSON.parse(body).error ? JSON.parse(body).error.message.value : "Bad request",
+                        response: response,
+                        body: body
+                    })
 
                 } else {
                     res.status(response.statusCode).send({
-                        error: bodyJSON.error.message.value ? bodyJSON.error.message.value : "Error getting the data",
+                        error: "Error getting the data",
                         response,
-                        body: bodyJSON
+                        body: body
                     })
                 }
             });
     });
 }
-
-
-
 
 
 module.exports = getBWData;

@@ -1,11 +1,6 @@
 
 import React, { Component } from 'react';
-import { Box } from '@material-ui/core';
-import { useStyles } from '../../styles/main';
 import { scaleLinear, scaleBand } from 'd3-scale';
-import { axisLeft, axisBottom } from 'd3-axis';
-import { max } from 'd3-array';
-import { select } from 'd3-selection';
 import ChartImpl from './ChartImpl';
 import PALETTES from '../../constants/colors';
 const colors = Object.values(PALETTES.GREEN_ORANGE)
