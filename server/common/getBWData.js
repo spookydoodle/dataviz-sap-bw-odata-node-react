@@ -16,7 +16,7 @@ const getBWData = (
     const sourceJSON = { ...dimensions, ...measures };
 
     return app.get(path, (req, res) => {
-        
+
         request({
             url: oDataURL.url,
             headers: {
@@ -26,32 +26,23 @@ const getBWData = (
             }
         }
             , (error, response, body) => {
-                // Get cookies token from req params and pass to request
-                const csrfToken = response ? response.headers['x-csrf-token'] : null;
+                // csrfToken should be stored in order to do post requests. Not needed in this app.
+                const csrfToken = response.headers['x-csrf-token'];
+                const bodyJSON = JSON.parse(body);
 
-                // Below checks need to handle
-                // - Wrong username and password
-                // - Locked username and password
-                // - Errors from oData, e.g. filtering by wrong dimension etc
-                //
-                // TODO: Proper errror handling needs to be assured here
-                if (error) {
-                    // If URL is not found, for demo purposes send a JSON with dummy data (you may delete this in your app)
-                    error.code === "ENOTFOUND" ?
-                        res.status(200).send({ info: "This is dummy data for demo purposes", results: generateData(20) })
-                        : res.status(500).send({ error: "Error retrieving data", message: error })
+                if (err) {
+                    res.status(500).send({ error: err, res: response, body: bodyJSON })
+
                 } else if (response.statusCode == 200) {
-                    if (csrfToken) {
-                        const results = JSON.parse(body).d.results;
-                        const finalResults = results.map(resultRow => createObj(sourceJSON, resultRow))
+                    res.status(response.statusCode)
+                        .send(bodyJSON.d.results.map(resultRow => createObj(sourceJSON, resultRow)))
 
-                        res.status(response.statusCode).send({info: "This is real data from SAP BW", results: finalResults })
-
-                    } else {
-                        res.status(401).json({ error: "Authentication error", message: body })
-                    }
                 } else {
-                    res.status(500).send({ error: "Unknown error", message: body })
+                    res.status(response.statusCode).send({
+                        error: bodyJSON.error.message.value ? bodyJSON.error.message.value : "Error getting the data",
+                        response,
+                        body: bodyJSON
+                    })
                 }
             });
     });
