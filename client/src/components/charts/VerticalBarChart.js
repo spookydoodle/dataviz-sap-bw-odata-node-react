@@ -1,16 +1,17 @@
 
 import React, { Component } from 'react';
 import { scaleLinear, scaleBand } from 'd3-scale';
+import { max } from 'd3-array';
 import ChartImpl from './ChartImpl';
 import PALETTES from '../../constants/colors';
 const colors = Object.values(PALETTES.GREEN_ORANGE)
 
-const VerticalBarChart = ({ data, size }) => {
+const VerticalBarChart = ({ data, size, resize }) => {
    const values = data.map(row => row.value)
    const categories = data.map(row => row.category)
    // const maxValue = max(values)
    const maxValue = 1000000
-   console.log(maxValue)
+
    // TODO: calculate based on longest category text length and font size
    const offset = { 
       top: 0, 
@@ -53,6 +54,7 @@ const VerticalBarChart = ({ data, size }) => {
          xCatAngle={-45}
          yCatAngle={0}
          size={size}
+         resize={resize}
          margin={margin}
          offset={offset}
          barColor={colors[0]}

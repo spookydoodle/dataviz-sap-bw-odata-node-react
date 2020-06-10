@@ -10,10 +10,11 @@ import ChartImpl from './ChartImpl';
 import PALETTES from '../../constants/colors';
 const colors = Object.values(PALETTES.GREEN_ORANGE)
 
-const HorizontalBarChart = ({ data, size }) => {
+const HorizontalBarChart = ({ data, size, resize }) => {
    const values = data.map(row => row.value)
    const categories = data.map(row => row.category)
    const maxValue = max(values)
+
    // TODO: handle optional props for axis offset from chart borders
    const offset = { 
        top: 0, 
@@ -56,6 +57,7 @@ const HorizontalBarChart = ({ data, size }) => {
          xCatAngle={-45}
          yCatAngle={0}
          size={size}
+         resize={resize}
          margin={margin}
          offset={offset}
          barColor={colors[0]}

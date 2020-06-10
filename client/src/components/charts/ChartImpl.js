@@ -7,6 +7,7 @@ import { axisLeft, axisBottom } from 'd3-axis';
 import { max } from 'd3-array';
 import { select } from 'd3-selection';
 
+// TODO: implement minHeight, minWidth, scroll within a card, padding and margin on chart, max length of a category name
 class ChartImpl extends Component {
    constructor(props) {
       super(props)
@@ -23,29 +24,36 @@ class ChartImpl extends Component {
 
    createBarChart() {
       const node = this.node;
-      const { 
-          categories, 
-          values, 
-          chartHeight,
-          xScale,
-          yScale,
-          xRect,
-          yRect,
-          widthRect, 
-          heightRect,
-          xCatAngle,
-          yCatAngle,
-          size, 
-          margin,
-          offset,
-          barColor,
-          xFontColor,
-          yFontColor,
-        } = this.props;
+      const {
+         categories,
+         values,
+         chartHeight,
+         xScale,
+         yScale,
+         xRect,
+         yRect,
+         widthRect,
+         heightRect,
+         xCatAngle,
+         yCatAngle,
+         size,
+         resize = "fixed",
+         margin,
+         offset,
+         barColor,
+         xFontColor,
+         yFontColor,
+      } = this.props;
 
+
+
+      const chart = select(node)
+
+      // Add responsiveness to the chart based on the 'resize' parameter, by default fixed size
+      if (resize === "responsive") chart.attr("viewBox", [0, 0, this.props.size.width, this.props.size.height])
 
       // Add margin to the whole chart
-      const chart = select(node).append('g')
+      chart.append('g')
          .attr('transform', `translate(${margin.top}, ${margin.left})`)
 
       // Add y axis
@@ -81,6 +89,8 @@ class ChartImpl extends Component {
          .attr('width', widthRect)
          .style('fill', barColor)
 
+
+
    }
 
    render() {
@@ -88,7 +98,8 @@ class ChartImpl extends Component {
          <svg
             ref={node => this.node = node}
             width={this.props.size.width}
-            height={this.props.size.height}>
+            height={this.props.size.height}
+         >
          </svg>
       )
    }

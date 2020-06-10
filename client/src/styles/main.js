@@ -70,6 +70,23 @@ export const useStyles = makeStyles(theme => ({
     bottom20: {
         marginBottom: '20px',
     },
+    padding2: {
+        padding: theme.spacing(2),
+    },
+    padding4: {
+        padding: theme.spacing(4),
+    },
+    padding5: {
+        padding: theme.spacing(5),
+    },
+    margin2: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
+    },
+    margin4: {
+        marginTop: theme.spacing(4),
+        marginBottop: theme.spacing(4),
+    },
 
     // Containers
     bgDark: {
