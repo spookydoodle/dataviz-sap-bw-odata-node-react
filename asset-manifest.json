@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/dataviz-sap-bw-odata-node-react/static/css/main.5f361e03.chunk.css",
+    "main.js": "/dataviz-sap-bw-odata-node-react/static/js/main.54fc8f1d.chunk.js",
+    "main.js.map": "/dataviz-sap-bw-odata-node-react/static/js/main.54fc8f1d.chunk.js.map",
+    "runtime-main.js": "/dataviz-sap-bw-odata-node-react/static/js/runtime-main.3f6b9ba7.js",
+    "runtime-main.js.map": "/dataviz-sap-bw-odata-node-react/static/js/runtime-main.3f6b9ba7.js.map",
+    "static/js/2.e36806b5.chunk.js": "/dataviz-sap-bw-odata-node-react/static/js/2.e36806b5.chunk.js",
+    "static/js/2.e36806b5.chunk.js.map": "/dataviz-sap-bw-odata-node-react/static/js/2.e36806b5.chunk.js.map",
+    "index.html": "/dataviz-sap-bw-odata-node-react/index.html",
+    "precache-manifest.ade9b886cbd8a12d3c94ed022cac4bb5.js": "/dataviz-sap-bw-odata-node-react/precache-manifest.ade9b886cbd8a12d3c94ed022cac4bb5.js",
+    "service-worker.js": "/dataviz-sap-bw-odata-node-react/service-worker.js",
+    "static/css/main.5f361e03.chunk.css.map": "/dataviz-sap-bw-odata-node-react/static/css/main.5f361e03.chunk.css.map",
+    "static/js/2.e36806b5.chunk.js.LICENSE.txt": "/dataviz-sap-bw-odata-node-react/static/js/2.e36806b5.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.3f6b9ba7.js",
+    "static/js/2.e36806b5.chunk.js",
+    "static/css/main.5f361e03.chunk.css",
+    "static/js/main.54fc8f1d.chunk.js"
+  ]
+}
