@@ -50,7 +50,7 @@ class ChartImpl extends Component {
       const chart = select(node)
 
       // Add responsiveness to the chart based on the 'resize' parameter, by default fixed size
-      if (resize === "responsive") chart.attr("viewBox", [0, 0, this.props.size.width, this.props.size.height])
+      if (resize === "responsive") chart.attr("viewBox", [0, -20, this.props.size.width, this.props.size.height])
 
       // Add margin to the whole chart
       chart.append('g')

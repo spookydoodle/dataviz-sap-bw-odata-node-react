@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import salesService from './services/salesService';
+import dummyData from './constants/dummyData';
 import Dashboard from './pages/Dashboard';
 
 class App extends Component {
@@ -11,22 +12,15 @@ class App extends Component {
   }
 
   componentDidMount() {
-    salesService.get().then(data => this.setState({ data: data }));
+    salesService.get()
+      .then(data => this.setState({ data: data }))
+      .catch(err => this.setState({ data: dummyData }));
   }
 
   render() {
     const { data } = this.state;
 
-    return data ? (
-      <React.Fragment>
-        {/* {data ? data.map((row, i) => <h1 key={i}>{row.country.text} - {row.division.text} - {row.month.text} -{row.sales.value}</h1>) : null} */}
-        <Dashboard data={data} />
-      </React.Fragment>
-    ) : (
-        <React.Fragment>
-          dataviz app
-        </React.Fragment>
-      )
+    return <Dashboard data={data} />
   }
 }
 

@@ -15,11 +15,11 @@ const VerticalBarChart = ({ data, size, resize }) => {
    // TODO: calculate based on longest category text length and font size
    const offset = { 
       top: 0, 
-      left: maxValue.toString().length * 5, 
+      left: maxValue.toString().length * 10, 
       bottom: categories.reduce((longestStr, str) => longestStr.length < str.length ? str : longestStr).length * 4, 
       right: 0, 
    }
-   const margin = {top: 20, left: 20, bottom: 20, right: 20}
+   const margin = {top: 0, left: 20, bottom: 20, right: 20}
    const chartWidth = size.width - margin.left - margin.right - offset.left - offset.right;
    const chartHeight = size.height - margin.left - margin.right - offset.top - offset.bottom;
 
