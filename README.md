@@ -1,5 +1,7 @@
 # dataviz-sap-bw-odata-node-react
-A simple data visualization application on Node.js and React.js requesting data from backend SAP BW system.
+A base for a data visualization application with server running on Node.js requesting data from backend SAP BW system and client built using React.js.
+
+See [this repository](https://github.com/kxkaro/dataviz) and [this page](https://kxkaro.github.io/dataviz) to view code for a cool data vizualization app using D3 and React.js
 
 # Intro
 This document describes three steps required to build a web application on Node.js and React.js with the purpose of analysis and visualization of data sourced from a backend SAP Business Warehouse (BW) system.
@@ -42,13 +44,13 @@ Step number three which describes setting up the client and building react data 
 
 ### Resources
 This part of this documentation was written based on below resources as well as own experiences:
-* Resource 1: https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/ 
-* Resource 2: https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query
-* Resource 3: https://launchpad.support.sap.com/#/notes/2367553
-* Resource 4: https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
-* Resource 5: https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
-* Resource 6: https://launchpad.support.sap.com/#/notes/2424613 
-* Resource 7: https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
+* [Resource 1](https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/): https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/ 
+* [Resource 2](https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query): https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query
+* [Resource 3](https://launchpad.support.sap.com/#/notes/2367553): https://launchpad.support.sap.com/#/notes/2367553
+* [Resource 4](https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries): https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
+* [Resource 5](https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html): https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
+* [Resource 6](https://launchpad.support.sap.com/#/notes/2424613 ): https://launchpad.support.sap.com/#/notes/2424613 
+* [Resource 7](https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/): https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
 
 ### SAP Gateway configuration
 This step is only required the first time an oData service is created in the system. 
@@ -56,7 +58,7 @@ This step is only required the first time an oData service is created in the sys
 Go to transaction `SPRO` and select: 
 *SAP NetWeaver – SAP Gateway - OData channel – Configuration – Connection Settings – SAP Gateway to SAP System – Manage SAP System Aliases*
 
-<img src="/public/images/spro-system-alias.png" width="500"/>
+<img src="public/images/spro-system-alias.png" width="500"/>
 
 Click on *Create System Alias* icon and enter below details:
 * System Alias: *LOCAL*
@@ -70,7 +72,7 @@ Click on *Create System Alias* icon and enter below details:
 * Web Service Provider *System: Leave blank*
 * Description: *System Alias Local*
 
-<img src="/public/images/system-alias.png" width="500"/>
+<img src="public/images/system-alias.png" width="500"/>
 
 ### Check and setup settings for EQ and oData
 This step is also only required the first time an oData service is created in the system. 
@@ -79,7 +81,7 @@ Go to transaction `SE38` and run program *EQ_RS_AUTOSETUP*
 ### Create BW query for oData service
 Create a BW query and tick the option *Remote Access By oData*.
 
-<img src="/public/images/query.png" width="500"/>
+<img src="public/images/query.png" width="500"/>
 
 **Limitations and query functionalities**
 * There are some limitations when building a query for oData service, for example: no multiple hierarchies and no additional structures allowed
@@ -106,7 +108,7 @@ Create a BW query and tick the option *Remote Access By oData*.
 *	Measures generate two JSON properties for the value (one raw and one formatted) and optionally one for the measure unit. You can make use of measure formatting from the query such as decimals or scaling factor.  
 * Technical names of formulas and selections - make your life easier by adding a technical name to all key figures (local formulas or selections). They impact property names in result JSON. If you don't add them, the property name will be equal to the technical name of base key figure or restricted/calculated key figure used in the key figure structure. If there are several selections in the query with the same KF/CKF/RKF, then the property name will be equal to the 25-character-long UID (visible in Outline panel in BWMT) (or maybe even will result in an error). So keep in mind that the name might change, therefore it is advised to add a local technical name and to not ever modify it.
 
-<img src="/public/images/key-figure-name.png" width="500"/>
+<img src="public/images/key-figure-name.png" width="500"/>
 
 ```
 // YYYYMMDDHHSS
@@ -142,31 +144,31 @@ Create a BW query and tick the option *Remote Access By oData*.
 It might be necessary to run this standard SAP function module which performs *generate native Gateway service* functionality, if the service is not available automatically after creating a query.
 Go to transaction `SE37` and execute function module *RSEQ_NAT_GENERATION*. Enter query technical name in `I_S_QUERY` field and click on the *execute* icon.
 
-<img src="/public/images/generate-service.png" width="500"/>
+<img src="public/images/generate-service.png" width="500"/>
 
 This should generate three messages:
 * SAP Gateway Model '<model_name>' Version '0001' created
 * SAP Gateway Service '<service_name>' Version '0001' created
 * SAP GW Model '<service_name> 'Version '0001' assigned to SAP GW Service '' Version ''
 
-<img src="/public/images/generate-service-messages.png" width="500"/>
-<img src="/public/images/generate-service-messages-2.png" width="500"/>
+<img src="public/images/generate-service-messages.png" width="500"/>
+<img src="public/images/generate-service-messages-2.png" width="500"/>
 
 ### Create and publish oData service for a query
 Go to transaction `/n/IWFND/MAINT_SERVICE` and click on *Add Service*.
 
-<img src="/public/images/add-service.png" width="500"/>
+<img src="public/images/add-service.png" width="500"/>
 
 Enter System Alias *LOCAL* and click on *Get Services*.
 
-<img src="/public/images/get-services.png" width="500"/>
+<img src="public/images/get-services.png" width="500"/>
 
 A list of available services should appear. Search for the newly created service and click on it. Select the right package and press OK. The new service is created.
 
 ### Get oData URL
 Find the added service and click on it. You should see an active ICF node in the bottom left corner. If for some reason the service status is not green, you can activate it there (click on ICF Node – Activate). To get the URL click on *Call Browser* button.
 
-<img src="/public/images/call-browser.png" width="500"/>
+<img src="public/images/call-browser.png" width="500"/>
 
 The default URL will have format:
 
@@ -184,7 +186,7 @@ To see metadata add `/$metadata` parameter to the URL. This will generate query 
 
 `http://<server>:<port>/sap/opu/odata/sap/T_ODATA_SRV/$metadata/`
 
-<img src="/public/images/results-metadata.png" width="500"/>
+<img src="public/images/results-metadata.png" width="500"/>
 
 ### Results
 To see results in JSON format, add `/QuerynameResults?$format=json` to the URL. Be careful with running the URL’s without specifying which dimensions to select. If a query includes many dimensions on very granular level (like *Article* or *Order ID*), you might end up pulling too many records from the source system causing performance issues. Think of it as running a query in *Analysis for Excel*, selecting a full fiscal year and adding all available dimensions, incl. *Article* and *Order ID*, to rows or columns.
@@ -272,30 +274,30 @@ To investigate what exactly needs to be added to a BW role, first create a test 
 
 Go to transaction `SU53` and display error messages for the test user you used to access oData URL. You should see the details of missing authorizations. See the authorization object details and service ID.
 
-<img src="/public/images/su53-1.png" width="500"/>
+<img src="public/images/su53-1.png" width="500"/>
 
 Go to transaction `PFCG` and edit the role to which you want to add the authorization. Go to Authorizations tab and click on the pencil icon by *Edit Authorization Data and Generate Profiles*.
 
-<img src="/public/images/pfcg-1.png" width="500"/>
+<img src="public/images/pfcg-1.png" width="500"/>
 
 Click on *Add Manually*, add `S_SERVICE` and click *OK*.
 
-<img src="/public/images/s-service.png" width="500"/>
+<img src="public/images/s-service.png" width="500"/>
 
 Here you need to make a decision whether you want to control precisely which services are added to the role or if you want to add authorizations to all created services at one go. That decision again depends on how strictly the organization’s authorization concept is implemented in the system.
 
 To add all services at one go just add * *All Values* in *Program, transaction or function*. 
 
-<img src="/public/images/s-service-2.png" width="500"/>
+<img src="public/images/s-service-2.png" width="500"/>
 
 If you want to control access to each created oData query (service), select *TADIR Service* and add the ID of the service which you can copy from the error log in `SU53` (*SAP Gateway: Service Groups Metadata*). 
 To paste the ID switch from *Object Name* to *Technical Name* by clicking on the button pointed by the arrow on the screenshot below. Paste the id in the Name column and press enter. 
 
-<img src="/public/images/s-service-3.png" width="500"/>
+<img src="public/images/s-service-3.png" width="500"/>
 
 Click *Save* and then *Generate* icons.
 
-<img src="/public/images/s-service-4.png" width="500"/>
+<img src="public/images/s-service-4.png" width="500"/>
 
 Then repeat the process again to find the ID for the second authorization *SAP Gateway Business Suite Enablement – Service*.
 Run the URL using the same test user credentials. This time the error will look like this:
@@ -331,11 +333,11 @@ Run the URL using the same test user credentials. This time the error will look 
 
 Refresh the error log in `SU53`. Copy the new ID and add it to the role in the same place as before.
 
-<img src="/public/images/su53-2.png" width="500"/>
+<img src="public/images/su53-2.png" width="500"/>
 
 Role authorization settings should look like below.
 
-<img src="/public/images/pfcg-2.png" width="500"/>
+<img src="public/images/pfcg-2.png" width="500"/>
 
 Now user has sufficient authorizations to see the data. Run the URL and you should see the results.
 
@@ -349,7 +351,7 @@ Three things should be transported in below sequence:
 * Service for above query together with its model and active ICF node (Customizing)
 Make sure that the system alias added to the service is marked as *Default System*.
 
-<img src="/public/images/default-system.png" width="500"/>
+<img src="public/images/default-system.png" width="500"/>
 
 It might happen that after transporting from development environment to QA or Production, you will see some errors because usually not all objects are added to the transport correctly.
 See this [blog post](https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/) which explains how to add required objects to the transport. 
@@ -366,9 +368,9 @@ Some errors you might see:
 
 **Solution:** Check in `/n/IWFND/MAINT_SERVICE` if your ICF Node is active. If not, activate it.
 
-<img src="/public/images/activate-icf-node.png" width="250"/>
+<img src="public/images/activate-icf-node.png" width="250"/>
 
-<img src="/public/images/activate-icf-node-2.png" width="250"/>
+<img src="public/images/activate-icf-node-2.png" width="250"/>
 
 
 **Error:** No System Alias found for Service 'XXX' and user 'X'
@@ -418,7 +420,7 @@ To collect the service and model follow the steps described in this [blog post](
 ## Set up server environment on Nodejs
 
 ### Server Resources
-* Resource 1: https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/
+* [Resource 1](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/): https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/
 
 ### Purpose
 Once we have completed the first part, which is setting up the way data is exposed from a backend SAP BW system, we need to set up our application’s server. The server is built on Node.js using the express framework. In the future the application will be extended with a MongoDB for writing additional data, such as comments and users.
@@ -536,7 +538,7 @@ In BW, each object has usually a key and a text property, and each measure has a
 
 In order to restructure data, it is necessary to build a mapping file with query details and a list of expected dimensions and measures. Such file will also allow to keep all metadata in one place, which can be useful especially when the data source structure changes. There are often multiple objects for the same thing in BW and depending on the business use, it might be necessary at some point to use another technical name for the same object. Creation of a mapping file will allow us to do such change only in one place, instead of everywhere in our code. Also, thanks to the restructuring we will be able to access the data using standard JavaScript object names, instead of long technical names from BW. For example to get a *Country* name from the data we can simply refer to `results.country.text`, instead of `results[“A0COUNTRY_T”]`. Using strings everywhere in the code is generally evil.
 
-The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) is located in [`/server/common/sap_constants/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) and contains details as seen below:
+The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) is located in [`server/common/sap_constants/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) and contains details as seen below:
 
 ```
 const queryInfo = {
@@ -621,11 +623,20 @@ To a clean JSON which looks like this:
 See [Routes](#routes) to see which methods are responsible for this change of JSON structure.
 
 ### Credentials
-To access the data the application needs to be connected to the internal network and use credentials of a BW user with sufficient authorizations. Credentials are passed in `Base64` encoded format `username:password`. Use `process.env` to securely store credentials in the deployment environment. 
-In a working version of the app you can use a file stored in the `/server/common/sap_constants/credentials.js`, BUT MAKE SURE YOU ADD IT TO THE GITIGNORE FILE. 
+To access the data the application needs to be connected to the internal network and use credentials of a BW user with sufficient authorizations. Credentials are passed in `Base64` encoded format `username:password`. 
+
+**Solution 1** - One service user with one set of authorizations to communicate between backend SAP BW system and the web app.
+
+Use `process.env` to securely store credentials in the deployment environment. 
+In a working version of the app you can use a file stored in the `server/common/sap_constants/credentials.js`, BUT MAKE SURE YOU ADD IT TO THE GITIGNORE FILE. 
+
+
+**Solution 2** - Allow users to log in using an input form to use their BW authorizations.
+
+TODO: Add input forms to pass username and password and encode it using Base64 and pass to the server route with request
 
 ### oData URL manipulation class
-Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `/server/common/`
+Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `server/common/`
 
 ### Routes
 See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) from `server/common/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
@@ -647,7 +658,7 @@ const routes = app => {
 }
 ```
 
-See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) method in `/server/common`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/helperMethods.js)
+See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) method in `server/common`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/helperMethods.js)
 
 ```
 const request = require('request')
@@ -796,7 +807,8 @@ measures: {
 ## Set up React client app
 
 ### Client resources
-* Resource 1: https://reactjs.org/docs/create-a-new-react-app.html 
+* [Resource 1](https://reactjs.org/docs/create-a-new-react-app.html): https://reactjs.org/docs/create-a-new-react-app.html 
+* [Resource 2](https://create-react-app.dev/docs/proxying-api-requests-in-development/): https://create-react-app.dev/docs/proxying-api-requests-in-development/
 
 ### Create react app
 Create an app called *client* inside the main folder.
@@ -805,7 +817,7 @@ npx create-react-app client
 ```
 
 ### Start scripts
-Go to `package.json` in the main app folder (so outside `/client` and `/server`) and install *concurrently* as we will need it to run both server and client at the same time.
+Go to `package.json` in the main app folder (so outside `client` and `server`) and install *concurrently* as we will need it to run both server and client at the same time.
 
 Add below scripts to run the whole application using `npm run dev`.
 ```
@@ -819,7 +831,7 @@ Add below scripts to run the whole application using `npm run dev`.
 ```
 
 ### Proxy
-Add proxy for communication between the client and the server in `package.json` in the `/client` folder. 
+Add proxy for communication between the client and the server in `package.json` in the `client` folder. 
 This is to resolve CORS errors. The port number must correspond to the port number used on the server, in our example it is 5000.
 ```
     "proxy": "http://localhost:5000",
@@ -838,7 +850,7 @@ Or with yarn:
 yarn add axios
 ```
 
-In the `/client/src` folder, create a folder called *services* and add there a file corresponding to a route file from the server. In this demo app the fille is called [`salesService.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js).
+In the `client/src` folder, create a folder called *services* and add there a file corresponding to a route file from the server. In this demo app the fille is called [`salesService.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js).
 
 ```
 import axios from 'axios';
@@ -891,10 +903,11 @@ export default App;
 
 Our API returns:
 
-<img src="/public/images/server-dummy-result.png" width="250"/>
+<img src="public/images/server-dummy-result.png" width="250"/>
 
 And the app:
 
-<img src="/public/images/client-app-result-1.png" width="250"/>
+<img src="public/images/client-app-result-1.png" width="250"/>
 
 ## D3 Data viz components
+See [this repository](https://github.com/kxkaro/dataviz) and [this page](https://kxkaro.github.io/dataviz) to view code for a cool data vizualization app using D3 and React.js
