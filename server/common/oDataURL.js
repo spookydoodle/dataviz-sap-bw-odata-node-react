@@ -7,90 +7,164 @@ class oDataURL {
         this.port = port;
         this.service = service;
         this.query = query;
-        this.variables = {},    // Expected { "<var_name>": "<var_value>", }
-        this.selections = {},   // Expected { "<dim>": { key: "", text: ""}, }
-        this.filters = {},      // Expected { "<dim>": ["<dim_value>"], }
-        this.order = {},        // Expected { "<dim_name>": "asc/desc", }
-        this.top = undefined,
-        this.skip = undefined,
-        this.baseURL = `http://${this.server}:${this.port}/sap/opu/odata/sap/${this.service}`;
-        this.urlString = `${this.baseURL}Results?$format=json`;
+        this.variables = new Map();         // Expected { "<var_name>": "<var_value>", }
+        this.selections = new Array();      // Expected ["<dim1>", "<dim2>"]
+        this.filters = new Map();           // Expected { "<dim>": ["<dim_value>"], }
+        this.order = new Map();             // Expected { "<dim_name>": "asc/desc", }
+        this.top = undefined;
+        this.skip = undefined;
+        // this.baseURL = `http://${this.server}:${this.port}/sap/opu/odata/sap/${this.service}/${this.query}`;
+        // this.urlString = `${this.baseURL}Results?$format=json`;
+        this.urlString = '';
     }
 
     get url() {
-        if(this.urlString.indexOf('$select') === -1) {
+        this.urlString = `http://${this.server}:${this.port}/sap/opu/odata/sap/${this.service}/${this.query}`
+
+        this.applyVariables();
+        this.applyFormat();
+        this.applySelections();
+        this.applyFilters();
+        this.applyOrder();
+        this.applyTop();
+        this.applySkip();
+
+        
+        console.log("this:");
+        console.log(this);
+
+        // Assure that characteristics are selected to avoid performance issues
+        if (this.urlString.indexOf('$select') === -1) {
             throw new Error(`No columns specified. Select at least one dimension or measure using .select() method.`);
         }
+
+        // Assure that number of rows to pull from data is specified. Getting too many rows will slow down the application
+        if (this.urlString.indexOf('$top') === -1) {
+            throw new Error(`Specify number of records to pull using .setTop() method.`);
+        }
+
+        console.log("Generated URL string: ");
+        console.log(this.urlString);
+
         return this.urlString;
     }
 
-    create = (
-        variables = {}, 
-        dimensions = {}, 
-        measures = {}, 
-        filters = {}, 
-        order = {}, 
-        top = undefined, 
-        skip = undefined
-        ) => {
-
-        // Add variables
-        Object.keys(variables).forEach(variable => this.setVariable(variable, variables[variable]))
-
-        // Select dimensions and measures
-        this.select([...flatten(dimensions), ...flatten(measures)])
-        
-        // Apply filters
-        Object.keys(filters).forEach(dim => this.filter(dim, filters[dim]))
-        
-        // Order by dimension
-        Object.keys(order).forEach(dim => this.orderBy(dim, order[dim]))
-
-        // Apply top and skip rows
-        top ? this.top(top) : null
-        skip ? this.top(skip) : null
+    removeFromEnd = (n) => {
+        this.urlString = this.urlString.substring(0, this.urlString.length - n);
     }
 
-    // Default fixed to json, optionally add a method to change to xml
-    // format = format => {
-    //     this.url.concat(`&$format=${format}`);
-    //     return this;
-    // }
+    applyVariables = () => {
+        if (this.variables.size > 0) {
+            this.urlString += "(";
+
+            for (let [variable, value] of this.variables) {
+                this.urlString += `${variable}=${value},`
+            }
+
+            // Remove comma after the last element
+            this.removeFromEnd(1);
+            this.urlString += `)/Results?`;
+        } 
+        else {
+            this.urlString += "Results?";
+        }
+    }
+
+    applyFormat = () => {
+        this.urlString += "$format=json";
+    }
+
+    applySelections = () => {
+        if (this.selections.length > 0) {
+            this.urlString += `&$select=${this.selections.join(',')}`;
+        }
+    }
+
+    // TODO: add option to exclude or add other conditions: 'eq' , 'ne' , 'le' , 'lt' , 'ge' , 'gt' 
+    applyFilters = () => {
+        if (this.filters.size > 0) {
+            this.urlString += `&$filter=`;
+
+            for (let [dimension, valArr] of this.filters) {
+                this.urlString += `(${dimension} eq '${valArr.join(`' or ${dimension} eq '`)}') and `
+            }
+
+            // Remove ' and ' after the last element
+            this.removeFromEnd(5);
+        }
+    }
+
+    applyOrder = () => {
+        if (this.order.size > 0) {
+            this.urlString += `&$orderby=`;
+
+            for (let [dimension, sort] of this.order) {
+                this.urlString += `${dimension} ${sort},`
+            }
+
+            // Remove comma after the last element
+            this.removeFromEnd(1);
+        }
+    }
+
+    applyTop = () => {
+        if (this.top) {
+            this.urlString += `&$top=${this.top}`;
+        }
+    }
+
+    applySkip = () => {
+        if (this.skip) {
+            this.urlString += `&$skip=${this.skip}`;
+        }
+    }
 
     // TODO: Get metadata and check variable type and apply url parameters accordingly (single value, interval/selection)
     // TODO: Add a check if the variable url parameter already exists in url, if yes, add new ones after a comma
     setVariable = (variable, value) => {
-        this.urlString = this.urlString.indexOf(")/") === -1 ? (
-            `${this.baseURL}/${this.query}(${variable}=${value})/${this.urlString.substring(this.urlString.indexOf('Results'))}`
-        ) : (
-            `${this.urlString.substring(0, this.urlString.indexOf(")/"))},${variable}=${value}${this.urlString.substring(this.urlString.indexOf(")/"))}`
-        ) 
+        this.variables.set(variable, value);
+        console.log("Variables: ", this.variables);
+
         return this;
     }
 
     select = dimArr => {
-        this.urlString = `${this.urlString}&$select=${dimArr.join()}`;
+        this.selections = [...dimArr];
+        console.log("Selections: ", this.selections);
+
         return this;
     }
 
+    // Client might pass empty array as filtering criteria which should be ignored
     filter = (dimension, valArr) => {
-        this.urlString = `${this.urlString}&$filter=${dimension} eq '${valArr.join(`' or ${dimension} eq '`)}'`;
+        this.filters.set(dimension, valArr);
+        console.log("Filters: ", this.filters);
+        // if(valArr && valArr.length > 0) {
+        //     this.urlString = `${this.urlString}&$filter=${dimension} eq '${valArr.join(`' or ${dimension} eq '`)}'`;
+        // }
+
         return this;
     }
 
     // TODO: error handling for 'order by 'dim' is not supported' - appears for measures
     orderBy = (dimension, sort) => {
-        this.urlString = `${this.urlString}&$orderby=${dimension} ${sort}`;
+        this.order.set(dimension, sort);
+        console.log("Order: ", this.order);
+
         return this;
     }
 
-    top = n => {
-        this.urlString = `${this.urlString}&$top=${n}`;
+    setTop = n => {
+        this.top = n;
+        console.log("Top: ", this.top);
+
         return this;
     }
 
-    skip = n => {
-        this.urlString = `${this.urlString}&$skip=${n}`;
+    setSkip = n => {
+        this.skip = n;
+        console.log("Skpi: ", this.skip);
+
         return this;
     }
 

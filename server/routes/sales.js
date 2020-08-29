@@ -22,10 +22,15 @@ const {
 // TODO: move to getBWData and make use of params
 const URL = new oDataURL(server, port, service, query)
     .setVariable(variables.country, '\'DE\'')
-    .select([...flatten({ division }), ...flatten({ qty, sales })])
-    .filter(period.key, ['001.2018'])   // TODO: pass filtering criteria in params
-    .orderBy(division.key, 'asc')
-    
+    .setVariable(variables.date, 'datetime\'2019-02-28T00:00\'')
+    .select([
+        ...flatten({ division, period }),
+        ...flatten({ qty, sales })
+    ])
+    .filter(period.key, ['001.2018'])
+    .orderBy(division.text, 'asc')
+    .orderBy(period.key, 'desc')
+    .setTop(100)
 
 console.log(URL.url)
 
@@ -35,7 +40,7 @@ const routes = app => {
         '/api/sales',
         URL,
         credentials,
-        { division },
+        { division, period },
         { qty, sales }
     );
 }
