@@ -46,11 +46,12 @@ Step number three which describes setting up the client and building react data 
 This part of this documentation was written based on below resources as well as own experiences:
 * [Resource 1](https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/): https://blogs.sap.com/2019/02/19/how-to-do-odata-services-from-bex-query/ 
 * [Resource 2](https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query): https://wiki.scn.sap.com/wiki/display/BI/Steps+to+Create+an+ODATA+service+for+a+BW+Query
-* [Resource 3](https://launchpad.support.sap.com/#/notes/2367553): https://launchpad.support.sap.com/#/notes/2367553
-* [Resource 4](https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries): https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
-* [Resource 5](https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html): https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
-* [Resource 6](https://launchpad.support.sap.com/#/notes/2424613 ): https://launchpad.support.sap.com/#/notes/2424613 
-* [Resource 7](https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/): https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
+* [Resource 3](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/): https://www.odata.org/documentation/odata-version-2-0/uri-conventions/
+* [Resource 4](https://launchpad.support.sap.com/#/notes/2367553): https://launchpad.support.sap.com/#/notes/2367553
+* [Resource 5](https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries): https://wiki.scn.sap.com/wiki/display/BI/BW+OData+Queries
+* [Resource 6](https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html): https://help.sap.com/viewer/64e2cdef95134a2b8870ccfa29cbedc3/7.4.19/en-US/c9384c774bcc4837b84bee3679520fb4.html
+* [Resource 7](https://launchpad.support.sap.com/#/notes/2424613 ): https://launchpad.support.sap.com/#/notes/2424613 
+* [Resource 8](https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/): https://blogs.sap.com/2016/03/21/how-to-change-dev-class-tmp-for-the-repository-objects-of-an-odata-service/
 
 ### SAP Gateway configuration
 This step is only required the first time an oData service is created in the system. 
@@ -438,6 +439,7 @@ A data warehouse (structured database), specifically a SAP BW, has its own speci
 **Building an oData URL manipulation class/library**
 
 The use of URL parameters in oData from SAP BW can be very powerful but also a bit confusing for a developer who is not familiar with SAP systems. We will build our own JavaScript class or mini library on the server to easily pass correct parameters and values to the oData URL.
+Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how to use oData URL parameters.
 
 
 ### Server folder structure
@@ -637,6 +639,8 @@ TODO: Add input forms to pass username and password and encode it using Base64 a
 
 ### oData URL manipulation class
 Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `server/common/`
+
+Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
 ### Routes
 See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) from `server/common/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
