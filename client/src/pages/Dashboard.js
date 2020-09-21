@@ -24,7 +24,7 @@ const Dashboard = ({ data }) => {
                                 Ultracool dashboard with some data
                             </Typography>
                             <Typography variant="subtitle2">
-                                ...well, at least the beginning of an ultracool dashboard :3
+                                ...well, at least the beginning of an ultracool dashboard :33
                             </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>

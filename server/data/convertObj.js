@@ -17,4 +17,4 @@ const createObj = (sourceRow, resultRow) =>
         ]
     ))
 
-module.exports = { createObj, flatten };
+module.exports = { flatten, createObj };

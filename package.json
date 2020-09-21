@@ -14,8 +14,8 @@
         "server": "npm run start --prefix server",
         "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
         "start": "npm run dev",
-        "predeploy": "yarn build",
-        "deploy": "gh-pages -d build"
+        "predeploy": "yarn build --prefix client",
+        "deploy": "gh-pages -d build --prefix client"
     },
     "keywords": [],
     "author": "",

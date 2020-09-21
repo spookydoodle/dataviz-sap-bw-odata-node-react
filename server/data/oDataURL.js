@@ -1,20 +1,21 @@
-// TODO: Add checks if certain URL parameters are already present
-// TODO: Error handling
+const { flatten } = require('./convertObj');
 
-class oDataURL {
-    constructor(server, port, service, query) {
+// See here for URI convention: https://www.odata.org/documentation/odata-version-2-0/uri-conventions/
+class ODataURL {
+    constructor(name, server, port, service, query, credentials) {
+        this.name = name;
         this.server = server;
         this.port = port;
         this.service = service;
         this.query = query;
+        this.credentials = credentials;     // Base64 encoded username:pass
         this.variables = new Map();         // Expected { "<var_name>": "<var_value>", }
-        this.selections = new Array();      // Expected ["<dim1>", "<dim2>"]
+        this.selections = {};               // Expected { "<dim1>", "<dim2>" }
         this.filters = new Map();           // Expected { "<dim>": ["<dim_value>"], }
+        this.filterOutValues = new Map();   // Expected { "<dim>": ["<dim_value>"], }
         this.order = new Map();             // Expected { "<dim_name>": "asc/desc", }
         this.top = undefined;
         this.skip = undefined;
-        // this.baseURL = `http://${this.server}:${this.port}/sap/opu/odata/sap/${this.service}/${this.query}`;
-        // this.urlString = `${this.baseURL}Results?$format=json`;
         this.urlString = '';
     }
 
@@ -28,10 +29,6 @@ class oDataURL {
         this.applyOrder();
         this.applyTop();
         this.applySkip();
-
-        
-        console.log("this:");
-        console.log(this);
 
         // Assure that characteristics are selected to avoid performance issues
         if (this.urlString.indexOf('$select') === -1) {
@@ -64,7 +61,7 @@ class oDataURL {
             // Remove comma after the last element
             this.removeFromEnd(1);
             this.urlString += `)/Results?`;
-        } 
+        }
         else {
             this.urlString += "Results?";
         }
@@ -74,9 +71,17 @@ class oDataURL {
         this.urlString += "$format=json";
     }
 
+    // Selections are provided in JSON format, which should also be reflected 
+    // in the result set sent in response to the client. 
+    //      Example: { brand: { key: "ZBRAND", text: "ZBRAND_T"} }
+    
     applySelections = () => {
-        if (this.selections.length > 0) {
-            this.urlString += `&$select=${this.selections.join(',')}`;
+        if (Object.values(this.selections).length > 0) {
+            // The 'flatten' method extracts the array of technical names, which are passed
+            // in this.selections as object values. 
+            //      Example: flatten({ brand: { key: "ZBRAND", text: "ZBRAND_T"} }) = ["ZBRAND", "ZBRAND_T"]
+            const selectionsArr = flatten(this.selections);
+            this.urlString += `&$select=${selectionsArr.join(',')}`;
         }
     }
 
@@ -89,8 +94,20 @@ class oDataURL {
                 this.urlString += `(${dimension} eq '${valArr.join(`' or ${dimension} eq '`)}') and `
             }
 
-            // Remove ' and ' after the last element
-            this.removeFromEnd(5);
+            // Filter if includes pattern.
+            // Only one value can be provided for one dimension.
+            // BW returns error "filter criteria too complex" if you try to add 'and' condition 
+            // for filtering out multiple patterns on one dimension
+            if (this.filterOutValues.size > 0) {
+                for (let [dimension, val] of this.filterOutValues) {
+                    this.urlString += `(not substringof('${val}',${dimension}))`
+                }
+            } else {
+                // Remove ' and ' after the last element
+                this.removeFromEnd(5);
+            }
+
+
         }
     }
 
@@ -119,18 +136,14 @@ class oDataURL {
         }
     }
 
-    // TODO: Get metadata and check variable type and apply url parameters accordingly (single value, interval/selection)
-    // TODO: Add a check if the variable url parameter already exists in url, if yes, add new ones after a comma
     setVariable = (variable, value) => {
         this.variables.set(variable, value);
-        console.log("Variables: ", this.variables);
 
         return this;
     }
 
-    select = dimArr => {
-        this.selections = [...dimArr];
-        console.log("Selections: ", this.selections);
+    select = selectJSON => {
+        this.selections = selectJSON;
 
         return this;
     }
@@ -138,10 +151,13 @@ class oDataURL {
     // Client might pass empty array as filtering criteria which should be ignored
     filter = (dimension, valArr) => {
         this.filters.set(dimension, valArr);
-        console.log("Filters: ", this.filters);
-        // if(valArr && valArr.length > 0) {
-        //     this.urlString = `${this.urlString}&$filter=${dimension} eq '${valArr.join(`' or ${dimension} eq '`)}'`;
-        // }
+
+        return this;
+    }
+
+    // Filter out pattern
+    filterOut = (dimension, val) => {
+        this.filterOutValues.set(dimension, val);
 
         return this;
     }
@@ -149,21 +165,18 @@ class oDataURL {
     // TODO: error handling for 'order by 'dim' is not supported' - appears for measures
     orderBy = (dimension, sort) => {
         this.order.set(dimension, sort);
-        console.log("Order: ", this.order);
 
         return this;
     }
 
     setTop = n => {
         this.top = n;
-        console.log("Top: ", this.top);
 
         return this;
     }
 
     setSkip = n => {
         this.skip = n;
-        console.log("Skpi: ", this.skip);
 
         return this;
     }
@@ -171,4 +184,4 @@ class oDataURL {
 }
 
 
-module.exports = oDataURL;
+module.exports = ODataURL;
