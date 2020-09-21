@@ -546,41 +546,36 @@ In BW, each object has usually a key and a text property, and each measure has a
 
 In order to restructure data, it is necessary to build a mapping file with query details and a list of expected dimensions and measures. Such file will also allow to keep all metadata in one place, which can be useful especially when the data source structure changes. There are often multiple objects for the same thing in BW and depending on the business use, it might be necessary at some point to use another technical name for the same object. Creation of a mapping file will allow us to do such change only in one place, instead of everywhere in our code. Also, thanks to the restructuring we will be able to access the data using standard JavaScript object names, instead of long technical names from BW. For example to get a *Country* name from the data we can simply refer to `results.country.text`, instead of `results[“A0COUNTRY_T”]`. Using strings everywhere in the code is generally evil.
 
-The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) is located in [`server/common/sap_constants/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js) and contains details as seen below:
+The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) is located in [`server/data/mapping/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) and contains details as seen below:
 
 ```
 const queryInfo = {
-    sales: {
-        server: 'abc.def.com',
-        port:  '1000',
-        service: 'T_ODATA_SRV',
-        query: 'T_ODATA',
-        variables: {
-            country: 'VAR_COUNTRY',
+    service: 'T_ODATA_SRV',
+    query: 'T_ODATA',
+    variables: {
+        date: 'VAR_DATE',
+    },
+    dimensions: {
+        country: {
+            key: "0COUNTRY",
+            text: "0COUNTRY_T",
         },
-        dimensions: {
-            country: {
-                key: "0COUNTRY ",
-                text: "0COUNTRY_T",
-            },
-		division: {
-                key: "0MATERIAL__0DIVISION",
-                text: "0MATERIAL__0DIVISION_T",
-            },
-
-            period: {
-                key: '0FISCPER',
-                text: '0FISCPER_T',
-            },
+        division: {
+            key: "0MATERIAL__0DIVISION",
+            text: "0MATERIAL__0DIVISION_T",
         },
-        measures: {
-            qty: {
-                value: "AAAABBBBCCCCDDDDEEEEFFFF1",
-            },
-            sales: {
-                value: "A0AMOUNT",
-                unit: "A0AMOUNT_E",
-            },
+        period: {
+            key: '0FISCPER',
+            text: '0FISCPER_T',
+        },
+    },
+    measures: {
+        qty: {
+            value: "AAAABBBBCCCCDDDDEEEEFFFF1",
+        },
+        sales: {
+            value: "A0AMOUNT",
+            unit: "A0AMOUNT_E",
         },
     },
 }
@@ -636,20 +631,19 @@ To access the data the application needs to be connected to the internal network
 **Solution 1** - One service user with one set of authorizations to communicate between backend SAP BW system and the web app.
 
 Use `process.env` to securely store credentials in the deployment environment. 
-In a working version of the app you can use a file stored in the `server/common/sap_constants/credentials.js`, BUT MAKE SURE YOU ADD IT TO THE GITIGNORE FILE. 
-
+See [`system.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/system.js)
 
 **Solution 2** - Allow users to log in using an input form to use their BW authorizations.
 
 TODO: Add input forms to pass username and password and encode it using Base64 and pass to the server route with request
 
 ### oData URL manipulation class
-Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/oDataURL.js) which is defined in `server/common/`
+Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/oDataURL.js) which is defined in `server/data/`
 
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
 ### Routes
-See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) from `server/common/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
+See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
 
 This method reuses the structure from the `queryInfo.dimensions` and `queryInfo.measures` and replaces the technical names from BW, which were placed as values, with the actual values from the oData results. It should be used for all routes leading to SAP BW data.
 
@@ -668,11 +662,11 @@ const routes = app => {
 }
 ```
 
-See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/getBWData.js) method in `server/common`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/helperMethods.js)
+See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) method in `server/data`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/convertObj.js)
 
 ```
 const request = require('request')
-const { createObj, flatten } = require('./helperMethods');
+const { createObj, flatten } = require('./convertObj');
 const generateData = require('./sap_constants/generateData');
 
 // Dimensions and measures are expected to be an object
@@ -709,7 +703,7 @@ const getBWData = (
                 else if (err) {
                     res.status(500).send({ error: err, res: response, body: body })
 
-                    // Successful request. Transform data to match expected JSON format defined in /common/sap_constants/queryInfo
+                    // Successful request. Transform data to match expected JSON format defined in /data/mapping/queryInfo
                 } else if (response.statusCode == 200) {
                     csrfToken = response.headers['x-csrf-token']; // csrfToken should be stored in order to do post requests. Not needed in this app.
                     res.status(response.statusCode)
@@ -745,7 +739,7 @@ const getBWData = (
 module.exports = getBWData;
 ```
 
-As a result this structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/common/sap_constants/queryInfo.js):
+As a result this structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js):
 ```
 dimensions: {
     country: {
