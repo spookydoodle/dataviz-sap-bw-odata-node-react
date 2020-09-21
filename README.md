@@ -27,6 +27,7 @@ This document describes three steps required to build a web application on Node.
     1. [Create object mapping file](#create-object-mapping-file)
     1. [Credentials](#credentials)
     1. [oData URL manipulation class](#odata-url-manipulation-class)
+    1. [Data Cache](#data-cache)
     1. [Routes](#routes)
 1. [Set up client React app](#set-up-react-client-app)
     1. [Resources](#client-resources)
@@ -451,7 +452,8 @@ Not all applications need constant communication with BW. Some dashboards show s
 ### Server folder structure
 * -**server** – app, index, config, package.json, seeds data
 * --**common** – helper methods, constants, etc.
-* ---**sap_constants** – excluded from git repository as it might include confidential data. Stores sap credentials and query information file
+* --**data** – create urls, get data methods
+* ---**mapping** – query information file
 * --**routes**
 * --**testing**
 
@@ -642,99 +644,225 @@ Select data using chainable methods of a class [`oDataURL`](https://github.com/k
 
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
+### Data Cache
+For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
+
+```
+// This class is created to store cache of the data in server memory
+// If data in the app is relatively static, there is no need to communicate between 
+// BW and hosting platform each time the client app is opened.
+
+// This class will compare the last update time with the time points provided
+// as class constructor parameters, and load a fresh update if conditions are met.
+// Otherwise it will provide the cached data to the client, preventing from
+// redundant requests from server to the data center (BW)
+class DataCache {
+    // provide updateTimes as an array of elements in this format: [HH, MM, SS, MS]
+    constructor(requestFunc, updateTimes) {
+        this.requestFunc = requestFunc;
+        this.updateTimes = updateTimes;
+        this.cache = null;
+        this.lastError = null;
+    }
+
+    // If now is after the updateTime and last cache data update is before the updateTime
+    isCacheExpired = () => {
+        let isExpired = false;
+        const now = new Date().getTime();
+        const lastUpdate = this.cache?.lastUpdate.getTime();
+        const updateTimes = this.updateTimes.map(updateTime => new Date().setHours(...updateTime));
+        updateTimes.sort((a, b) => a < b ? 1 : -1)
+        
+        for (let i = 0; i < updateTimes.length; i++) {
+            // console.log("checking", i)
+            if (now > lastUpdate && now > updateTimes[i] && lastUpdate < updateTimes[i]) {
+                isExpired = true;
+                break;
+            }
+        }
+
+        return isExpired;
+    }
+
+    getData = () => {
+        if (!this.cache || this.isCacheExpired()) {
+            // console.log(new Date(), "expired");
+
+            return this.requestFunc().then((data) => {
+                // If new request results in an error, do not overwrite the cache
+                if (data.status !== 200) {
+                    console.log("Error getting new data");
+                    this.lastError = {
+                        time: new Date(),
+                        message: data.send.error,
+                    }
+
+                    // If errors appear with the initial cache load, send the error message to client
+                    // Set lastUpdate date to beginning, so that the server tries to request the data from the source system again
+                    // with the next client request
+                    if (!this.cache) {
+                        this.cache = {
+                            lastUpdate: new Date(0),
+                            data: { status: 500, send: [{ error: data.send.error }] }
+                        }
+                    }
+                } else {
+                    console.log("Sending new data");
+                    this.cache = {
+                        lastUpdate: new Date(),
+                        data: data,
+                    }
+                }
+                
+                return { ...this.cache, lastError: this.lastError };
+            });
+        } else {
+            console.log(new Date(), 'cache hit');
+            return Promise.resolve({ ...this.cache, lastError: this.lastError });
+        }
+    }
+
+    resetCache = () => {
+        this.lastUpdate = new Date(0);
+    }
+
+}
+
+module.exports = DataCache;
+```
+
+
 ### Routes
 See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
 
 This method reuses the structure from the `queryInfo.dimensions` and `queryInfo.measures` and replaces the technical names from BW, which were placed as values, with the actual values from the oData results. It should be used for all routes leading to SAP BW data.
 
-In the route file, which is directly used in the `app.js`, we can define the routes, and therefore selections, which we need for the client app. For example, we can create a get route `/api/sales` which selects *Division* and *Quantity* and *Sales* amounts.
+In the route file, which is directly used in the `app.js`, we can define the routes, and therefore selections, which we need for the client app. For example, we can create a get route `/api/sales/countries` which selects *Country*, *Quantity* and *Sales* amounts.
+
+See [`generateURLs.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/generateURLs.js) from `server/data/` to see how the oData queries are created.
+
+If the same selections are available in two queries and you want to merge results in one request, you can pass both queries in the array in the third parameter of `getBWData`. they will be executed in a Promise.all() statement. 
 
 ```
+const getBWData = require('../data/getBWData');
+const { query } = require('../data/generateURLs');
+
+// The getBWData method pulls data from source system SAP BW and caches it in memory
+// Data is first requested from cache. If cache is not available, then from the source system
+// The cache class updates the data three times a day. See /src/data/DataCache.js
+// The method receives an array of queries and joins the output together so that the client 
+// makes less requests which browsers can handle simultaneously
 const routes = app => {
-    getBWData(
-        app,
-        '/api/sales',
-        URL,
-        credentials,
-        { division },
-        { qty, sales }
-    );
+    getBWData(app, '/api/sales/countries', [query].map(el => el.countries));
+    getBWData(app, '/api/sales/divisions', [query].map(el => el.kpis));
+    getBWData(app, '/api/sales/periods', [query].map(el => el.periods));
 }
+
+
+module.exports = routes;
 ```
 
 See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) method in `server/data`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/convertObj.js)
 
 ```
-const request = require('request')
-const { createObj, flatten } = require('./convertObj');
-const generateData = require('./sap_constants/generateData');
+const request = require('request');
+const { createObj } = require('./convertObj');
+const DataCache = require('../data/DataCache');
+
 
 // Dimensions and measures are expected to be an object
 const getBWData = (
     app,
-    path,                       // server api path
-    oDataURL,                   // oData URL to SAP gateway
-    credentials = undefined,    // Base64 encoded string: 'BWUserID:password'
-    dimensions = {},            // provide in format { dim: { key: "key_value", text: "text_value" }, }
-    measures = {},              // provide in format { dim: { value: value, unit: "unit_value" }, }
+    path,               // server api path
+    oDataURLs,          // An array with oData URLs to SAP gateway. 
 ) => {
 
-    // TODO: generate oDataURL here based on URL parameters from 'path'
-    const sourceJSON = { ...dimensions, ...measures };
+    const requestFunc = () => Promise.all(oDataURLs.map((oDataURL, i) => promiseRequest(oDataURL)))
+        .then(results => ({ status: 200, send: results.map(resultSet => resultSet.send.body).flat() }))
+        .catch(errors => errors)
 
-    return app.get(path, (req, res) => {
 
-        request({
-            url: oDataURL.url,
-            headers: {
-                "Authorization": `Basic ${process.env.BWCREDENTIALS || credentials}`, // Base64 encoded "username:pass"
-                "Content-Type": "application/json",
-                "x-csrf-token": "Fetch"
-            }
-        }
-            , (err, response, body) => {
-                let csrfToken = undefined;
+    const resultsCache = new DataCache(requestFunc, [[6, 0, 0, 1], [7, 0, 0, 0], [8, 30, 0, 0], [12, 0, 0, 0], [18, 0, 0, 0]]);
 
-                // If wrong url provided, fill API with dummy data for demo purposes
-                if (err && err.code === "ENOTFOUND") {
-                    res.status(200).send({ info: "This is dummy data for demo purposes", results: generateData(20) })
-                }
-                // If any other error, pass the error message as it is
-                else if (err) {
-                    res.status(500).send({ error: err, res: response, body: body })
-
-                    // Successful request. Transform data to match expected JSON format defined in /data/mapping/queryInfo
-                } else if (response.statusCode == 200) {
-                    csrfToken = response.headers['x-csrf-token']; // csrfToken should be stored in order to do post requests. Not needed in this app.
-                    res.status(response.statusCode)
-                        .send(JSON.parse(body).d.results.map(resultRow => createObj(sourceJSON, resultRow)))
-
-                    // Either wrong username or password or account locked after providing a wrong password more than three times
-                } else if (response.statusCode == 401) {
-                    res.status(response.statusCode).send({
-                        error: "User does not have authorization or account locked due to incorrect logon attempts.",
-                        response: response,
-                        body: body
+    return app.get(path, (req, res) => (
+        resultsCache.getData()
+            .then(results => {
+                res.status(results?.data?.status)
+                    .send({ 
+                        lastUpdate: results?.lastUpdate, 
+                        data: results?.data?.send,
+                        lastError: results?.lastError,
                     })
-                    // Bad requests such as requesting a non existing column or misspelled technical name, wrong value passed in query string
-                } else if (response.statusCode == 404) {
-                    res.status(response.statusCode).send({
-                        error: JSON.parse(body).error ? JSON.parse(body).error.message.value : "Bad request",
-                        response: response,
-                        body: body
-                    })
-
-                } else {
-                    res.status(response.statusCode).send({
-                        error: "Error getting the data",
-                        response,
-                        body: body
-                    })
-                }
-            });
-    });
+            })
+    ));
 }
 
+
+const promiseRequest = (oDataURL) => new Promise((resolve, reject) => {
+    request({
+        url: oDataURL.url,
+        headers: {
+            // Base64 encoded usename:pass
+            "Authorization": `Basic ${oDataURL.credentials}`,
+            "Content-Type": "application/json",
+            "x-csrf-token": "Fetch"
+        }
+
+    }, (error, response, body) => {
+
+        if (error) {
+            console.log(`Error by getting ${oDataURL.name}`);
+            reject(({
+                status: 500,
+                send: { error, response, body }
+            }))
+
+        } else if (response.statusCode == 200) {
+            csrfToken = response.headers['x-csrf-token'];
+            console.log(`Success getting ${oDataURL.name}`);
+
+            resolve({
+                status: 200,
+                send: {
+                    error,
+                    response,
+                    body: JSON.parse(body).d.results.map(resultRow => createObj(oDataURL.selections, resultRow))
+                }
+            })
+
+        } else if (response.statusCode == 401) {
+            console.log(`Error 401 by getting ${oDataURL.name}`);
+            reject(({
+                status: response.statusCode,
+                send: {
+                    error: "User does not have authorization or account locked due to incorrect logon attempts.",
+                    response,
+                    body,
+                },
+            }))
+        } else if (response.statusCode == 404) {
+            console.log(`Error 404 by getting ${oDataURL.name}`);
+            reject(({
+                status: response.statusCode,
+                send: {
+                    error: JSON.parse(body).error ? JSON.parse(body).error.message.value : "Bad request",
+                    response,
+                    body,
+                }
+            }))
+        } else {
+            console.log(`Error ${response.statusCode} by getting ${oDataURL.name}`);
+            reject(({
+                status: response.statusCode,
+                send: {
+                    error: "Error getting the data",
+                    response,
+                    body,
+                },
+            }))
+        }
+    });
+});
 
 module.exports = getBWData;
 ```
