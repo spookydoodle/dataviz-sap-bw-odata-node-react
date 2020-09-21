@@ -645,7 +645,7 @@ Select data using chainable methods of a class [`oDataURL`](https://github.com/k
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
 ### Data Cache
-For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
+See [`DataCache.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/DataCache.js) from `server/data/`. For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
 
 ```
 // This class is created to store cache of the data in server memory
