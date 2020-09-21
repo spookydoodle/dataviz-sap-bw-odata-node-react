@@ -3,6 +3,7 @@ import './App.css';
 import salesService from './services/salesService';
 import dummyData from './constants/dummyData';
 import Dashboard from './pages/Dashboard';
+import Redirect from './pages/Redirect';
 
 class App extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class App extends Component {
   render() {
     const { data } = this.state;
 
-    return <Dashboard data={data} />
+    return <Redirect />
   }
 }
 
