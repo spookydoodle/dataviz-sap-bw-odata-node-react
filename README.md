@@ -1,7 +1,7 @@
 # dataviz-sap-bw-odata-node-react
 A base for a data visualization application with server running on Node.js requesting data from backend SAP BW system and client built using React.js. View code on [this repository](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react). 
 
-See also [this repository](https://github.com/kxkaro/dataviz) and [this page](https://kxkaro.github.io/dataviz) to view code for a cool data vizualization app using D3 and React.js
+See also [this repository](https://github.com/kxkaro/dataviz) and [this page](http://35.204.1.238:80) to view code for a cool data vizualization app using D3 and React.js
 
 # Intro
 This document describes three steps required to build a web application on Node.js and React.js with the purpose of analysis and visualization of data sourced from a backend SAP Business Warehouse (BW) system.
@@ -440,6 +440,12 @@ A data warehouse (structured database), specifically a SAP BW, has its own speci
 
 The use of URL parameters in oData from SAP BW can be very powerful but also a bit confusing for a developer who is not familiar with SAP systems. We will build our own JavaScript class or mini library on the server to easily pass correct parameters and values to the oData URL.
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how to use oData URL parameters.
+
+**Data fetch optimization**
+Often times, the app will need to run many simple queries to feed its components. The aim is to move as many calculations, aggregations, filtering etc.. to the data warehouse, instead of doing them on the front-end. In the end the designated data bases were built in order to perform them in the most optimal way. Having a separate backend server allows us to decide which and how many queries are ran simultaneously in order to speed things up for the client. Browsers have a limit of six simultaneous requests. A backend server can do many more and combine them in a single request sent to the client.
+
+**Data cache**
+Not all applications need constant communication with BW. Some dashboards show static data that needs to be refreshed only once or twice a day. A backend server can build up a cache of the data requested from BW and received as a few kB of data in JSON format. This will allow to reduce traffic between the BW data center and the hosting platform and assure faster loading time for the end user.
 
 
 ### Server folder structure
