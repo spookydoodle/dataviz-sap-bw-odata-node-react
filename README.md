@@ -1,7 +1,7 @@
 # dataviz-sap-bw-odata-node-react
 A base for a data visualization application with server running on Node.js requesting data from backend SAP BW system and client built using React.js. View code on [this repository](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react). 
 
-See also [this repository](https://github.com/kxkaro/dataviz) and [this page](http://35.204.1.238:80) to view code for a cool data vizualization app using D3 and React.js
+See also [this repository](https://github.com/kxkaro/dataviz) and [this page](http://dataviz.kkx.rocks/) to view code for a cool data vizualization app using D3 and React.js
 
 # Intro
 This document describes three steps required to build a web application on Node.js and React.js with the purpose of analysis and visualization of data sourced from a backend SAP Business Warehouse (BW) system.
