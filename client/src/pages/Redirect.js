@@ -63,6 +63,7 @@ const useStyles = makeStyles((theme) =>
             },
         },
         container: {
+            fontFamily: "Open Sans",
             textAlign: "center",
             position: "relative",
             width: "80%",
@@ -103,6 +104,7 @@ const useStyles = makeStyles((theme) =>
             color: "#E1E5F2",
             transition: "color .4s ease-out",
             fontWeight: "bold",
+            margin: ".2em auto",
             "&::after": {
                 content: "''",
                 borderRadius: "1em",
@@ -167,16 +169,21 @@ const Dashboard = ({ data }) => {
                 </Typography>
                 <Grid container justify="center" alignItems="center" >
                     <Grid item xs={12} sm={5} className={classes.glassMorphic}>
-                        <a href="http://dataviz.kkx.rocks/" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                        <a href="https://github.com/kxkaro/dataviz-sap-bw-odata-node-react" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
-                                Dashboard
+                            🔭 Git repo backend 
                 </Typography>
                         </a>
                     </Grid>
-                    <Grid item xs={12} sm={5} className={classes.glassMorphic}>
+                    <Grid item xs={12} sm={5} container direction="column" className={classes.glassMorphic}>
+                        <a href="http://dataviz.kkx.rocks/" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                            <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
+                                💖 Dashboard
+                </Typography>
+                        </a>
                         <a href="https://github.com/kxkaro/dataviz" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
-                                Git repo
+                                📊 Git repo front-end
                 </Typography>
                         </a>
                     </Grid>

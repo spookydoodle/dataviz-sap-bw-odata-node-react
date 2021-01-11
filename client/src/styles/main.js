@@ -32,6 +32,9 @@ export const theme = createMuiTheme({
             secondary: color4,
         },
     },
+    typography: {
+      fontFamily: ["Open Sans", "Arial"].join(","),
+    },
 });
 
 // Misc const used in styles
