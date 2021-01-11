@@ -1,4 +1,4 @@
-const ODataURL = require('./ODataURL');
+const BWoData = require('./BWoData');
 const { formatToDateVar, getDateWithOffset } = require('../common/dates');
 const queryInfo = require('./mapping/queryInfo');
 const { server, port, credentials } = require('./system');
@@ -15,21 +15,21 @@ const getURLs = (name, queryInfo) => {
     const { qty, sales } = measures;
 
     // Get sales and quantity by countries, divisions and fiscal periods
-    const countries = new ODataURL(`Main KPI's ${name}`, server, port, service, query, credentials)
+    const countries = new BWoData(`Main KPI's ${name}`, server, port, service, query, credentials)
         .setVariable(variables.date, yesterdayVar)
         .select({ country, sales, qty })
         .filter(period.key, ["001.2020", "002.2020", "003.2020"])
         .orderBy(qty.value, 'desc')
         .setTop(1000);
 
-    const divisions = new ODataURL(`Sites ${name}`, server, port, service, query, credentials)
+    const divisions = new BWoData(`Sites ${name}`, server, port, service, query, credentials)
         .setVariable(variables.date, yesterdayVar)
         .select({ division, sales, qty })
         .filter(period.key, ["001.2020", "002.2020", "003.2020"])
         .orderBy(sales.value, 'desc')
         .setTop(1000);
 
-    const periods = new ODataURL(`Management Countries ${name}`, server, port, service, query, credentials)
+    const periods = new BWoData(`Management Countries ${name}`, server, port, service, query, credentials)
         .setVariable(variables.date, yesterdayVar)
         .select({ period, sales, qty })
         .orderBy(period.key, 'asc')

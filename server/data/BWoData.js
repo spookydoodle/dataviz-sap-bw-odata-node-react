@@ -1,7 +1,7 @@
 const { flatten } = require('./convertObj');
 
 // See here for URI convention: https://www.odata.org/documentation/odata-version-2-0/uri-conventions/
-class ODataURL {
+class BWoData {
     constructor(name, server, port, service, query, credentials) {
         this.name = name;
         this.server = server;
@@ -184,4 +184,4 @@ class ODataURL {
 }
 
 
-module.exports = ODataURL;
+module.exports = BWoData;
