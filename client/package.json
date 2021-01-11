@@ -10,6 +10,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "clsx": "^1.1.1",
     "d3-array": "^2.4.0",
     "d3-axis": "^1.0.12",
     "d3-ease": "^1.0.6",
@@ -24,6 +25,7 @@
     "moment": "^2.26.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-image": "^4.0.3",
     "react-scripts": "3.4.1"
   },
   "scripts": {
