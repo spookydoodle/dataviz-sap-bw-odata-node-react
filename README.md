@@ -464,10 +464,10 @@ The [`index.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/
 
 ```
 const app = require('./app');
-const PORT = process.env.PORT || 5000;
 
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server has started on port ${PORT}`);
+    console.log(`App listening on port ${PORT}!`);
 });
 ```
 
@@ -491,54 +491,39 @@ yarn add nodemon –dev
 
 See `package.json` to view dependencies and add scripts.
 
-```
-{
-  "name": "dataviz-sap-bw-odata-node-express",
-    "version": "1.0.0",
-    "description": "A server api fetching and exposing data from a SAP BW system",
-    "main": "index.js",
-    "scripts": {
-        "start": "nodemon index.js"
-    },
-    "keywords": [],
-    "author": "",
-    "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "express": "^4.17.1"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.4"
-  }
-}
-
-```
 
 The application can be run by executing the `nodemon index.js` script. Before it is possible to do so, it is required to set up the `app.js` and routes.
 
-The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) initializes the express application and handles routes. Route files are stored in a separate folder and imported in the `app.js`.
+The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) initializes the express application and handles routes. Routers are stored in a separate folder and imported in the `app.js`.
 
 ```
-var express = require('express'),
-    app = express(),
-    bodyParser = require('body-parser');
+const express = require('express');
+const { config } = require('./common/config');
+const healthRouter = require('./routers/health');
+const salesRouter = require('./routers/sales');
 
-// Middleware for parsing json objects
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+const app = express();
 
-// Production setup
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static('reactApp/build'));
+// Define main router
+const indexRouter = express.Router();
 
-    const path = require('path');
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, 'reactApp', 'build', 'index.html'));
-    });
-}
+// Define hello page for index - should be available for health checks on ALB
+indexRouter.get('/', (req, res) => {
+    res.status(200).send(`
+    <h1>Hello from BW Node.js server.</h1>
+    <p>Contact us via abc@def.com</p>
+    `);
+});
 
-// Handle BW API routes
-require('./routes/sales')(app);
+// Health page displays info about uptime and connection to the data center (SAP BW / SAP HANA BW)
+indexRouter.use(config.baseUrl.health, healthRouter);
+
+// Sales routes used in the Retail Flash application - connect to SAP BW via oData
+indexRouter.use(config.baseUrl.api, salesRouter);
+
+// Configure router to be based on a path where it's deployed
+// Example: ALB listeners on AWS EC2 could have a rule defined for path '/bw*', app is hosted on example.com/bw
+app.use(config.baseUrl.index, indexRouter);
 
 module.exports = app;
 ```
@@ -640,100 +625,16 @@ See [`system.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob
 TODO: Add input forms to pass username and password and encode it using Base64 and pass to the server route with request
 
 ### oData URL manipulation class
-Select data using chainable methods of a class [`oDataURL`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/oDataURL.js) which is defined in `server/data/`
+Select data using chainable methods of a class [`BWoData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/BWoData.js) which is defined in `server/data/`
 
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
 ### Data Cache
 See [`DataCache.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/DataCache.js) from `server/data/`. For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
 
-```
-// This class is created to store cache of the data in server memory
-// If data in the app is relatively static, there is no need to communicate between 
-// BW and hosting platform each time the client app is opened.
-
-// This class will compare the last update time with the time points provided
-// as class constructor parameters, and load a fresh update if conditions are met.
-// Otherwise it will provide the cached data to the client, preventing from
-// redundant requests from server to the data center (BW)
-class DataCache {
-    // provide updateTimes as an array of elements in this format: [HH, MM, SS, MS]
-    constructor(requestFunc, updateTimes) {
-        this.requestFunc = requestFunc;
-        this.updateTimes = updateTimes;
-        this.cache = null;
-        this.lastError = null;
-    }
-
-    // If now is after the updateTime and last cache data update is before the updateTime
-    isCacheExpired = () => {
-        let isExpired = false;
-        const now = new Date().getTime();
-        const lastUpdate = this.cache?.lastUpdate.getTime();
-        const updateTimes = this.updateTimes.map(updateTime => new Date().setHours(...updateTime));
-        updateTimes.sort((a, b) => a < b ? 1 : -1)
-        
-        for (let i = 0; i < updateTimes.length; i++) {
-            // console.log("checking", i)
-            if (now > lastUpdate && now > updateTimes[i] && lastUpdate < updateTimes[i]) {
-                isExpired = true;
-                break;
-            }
-        }
-
-        return isExpired;
-    }
-
-    getData = () => {
-        if (!this.cache || this.isCacheExpired()) {
-            // console.log(new Date(), "expired");
-
-            return this.requestFunc().then((data) => {
-                // If new request results in an error, do not overwrite the cache
-                if (data.status !== 200) {
-                    console.log("Error getting new data");
-                    this.lastError = {
-                        time: new Date(),
-                        message: data.send.error,
-                    }
-
-                    // If errors appear with the initial cache load, send the error message to client
-                    // Set lastUpdate date to beginning, so that the server tries to request the data from the source system again
-                    // with the next client request
-                    if (!this.cache) {
-                        this.cache = {
-                            lastUpdate: new Date(0),
-                            data: { status: 500, send: [{ error: data.send.error }] }
-                        }
-                    }
-                } else {
-                    console.log("Sending new data");
-                    this.cache = {
-                        lastUpdate: new Date(),
-                        data: data,
-                    }
-                }
-                
-                return { ...this.cache, lastError: this.lastError };
-            });
-        } else {
-            console.log(new Date(), 'cache hit');
-            return Promise.resolve({ ...this.cache, lastError: this.lastError });
-        }
-    }
-
-    resetCache = () => {
-        this.lastUpdate = new Date(0);
-    }
-
-}
-
-module.exports = DataCache;
-```
-
 
 ### Routes
-See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which is a general method to pull data from a BW query using oData. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
+See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which stores a general methods to fetch data from a BW query using oData and to save it in DataCache. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
 
 This method reuses the structure from the `queryInfo.dimensions` and `queryInfo.measures` and replaces the technical names from BW, which were placed as values, with the actual values from the oData results. It should be used for all routes leading to SAP BW data.
 
@@ -744,130 +645,66 @@ See [`generateURLs.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-reac
 If the same selections are available in two queries and you want to merge results in one request, you can pass both queries in the array in the third parameter of `getBWData`. they will be executed in a Promise.all() statement. 
 
 ```
-const getBWData = require('../data/getBWData');
+const express = require('express');
+const { fetchAll, getFromCache } = require('../data/getBWData');
+const { updateTimes, checkUpdateFreq } = require('../constants/updateTimes');
+const DataCache = require('../data/DataCache');
 const { query } = require('../data/generateURLs');
 
-// The getBWData method pulls data from source system SAP BW and caches it in memory
-// Data is first requested from cache. If cache is not available, then from the source system
-// The cache class updates the data three times a day. See /src/data/DataCache.js
-// The method receives an array of queries and joins the output together so that the client 
-// makes less requests which browsers can handle simultaneously
-const routes = app => {
-    getBWData(app, '/api/sales/countries', [query].map(el => el.countries));
-    getBWData(app, '/api/sales/divisions', [query].map(el => el.kpis));
-    getBWData(app, '/api/sales/periods', [query].map(el => el.periods));
-}
+// Define a router for sales
+const router = express.Router();
 
+const routeDefinitions = [
+    {
+        path: '/countries',
+        name: 'Countries',
+        BWoDataArr: [query].map(el => el.countries),
+    },
+    {
+        path: '/divisions',
+        name: 'Divisions',
+        BWoDataArr: [query].map(el => el.divisions),
+    },
+    {
+        path: '/periods',
+        name: 'Fiscal Periods',
+        BWoDataArr: [query].map(el => el.periods),
+    },
+];
 
-module.exports = routes;
+// Add base path for all above paths
+const baseUrl = '/sales';
+
+// All above requests follow exactly the same logic
+routeDefinitions.forEach(async ({ path, name, BWoDataArr }, i) => {
+    // Initialize Data Cache for route
+    // Delay each request so that one query is not executed several times 
+    // in exactly the same moment (SAP BW tend to have performance issues)
+    const resultsCache = new DataCache(name, () => fetchAll(BWoDataArr), updateTimes, checkUpdateFreq, 1000 * 10 * i);
+
+    // Create Get request route
+    router.get(`${baseUrl}${path}`, async (req, res) => {
+        const response = await getFromCache(resultsCache);
+
+        res.status(response.status).send(response);
+    });
+});
+
+// Hello route
+router.get('/', (req, res) => {
+    res.status(200).send(`
+    <h1>Hello from BW API.</h1>
+    <p>Contact us via abc@def.com</p>
+    `);
+});
+
+module.exports = router;
 ```
 
 See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) method in `server/data`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/convertObj.js)
 
-```
-const request = require('request');
-const { createObj } = require('./convertObj');
-const DataCache = require('../data/DataCache');
 
-
-// Dimensions and measures are expected to be an object
-const getBWData = (
-    app,
-    path,               // server api path
-    oDataURLs,          // An array with oData URLs to SAP gateway. 
-) => {
-
-    const requestFunc = () => Promise.all(oDataURLs.map((oDataURL, i) => promiseRequest(oDataURL)))
-        .then(results => ({ status: 200, send: results.map(resultSet => resultSet.send.body).flat() }))
-        .catch(errors => errors)
-
-
-    const resultsCache = new DataCache(requestFunc, [[6, 0, 0, 1], [7, 0, 0, 0], [8, 30, 0, 0], [12, 0, 0, 0], [18, 0, 0, 0]]);
-
-    return app.get(path, (req, res) => (
-        resultsCache.getData()
-            .then(results => {
-                res.status(results?.data?.status)
-                    .send({ 
-                        lastUpdate: results?.lastUpdate, 
-                        data: results?.data?.send,
-                        lastError: results?.lastError,
-                    })
-            })
-    ));
-}
-
-
-const promiseRequest = (oDataURL) => new Promise((resolve, reject) => {
-    request({
-        url: oDataURL.url,
-        headers: {
-            // Base64 encoded usename:pass
-            "Authorization": `Basic ${oDataURL.credentials}`,
-            "Content-Type": "application/json",
-            "x-csrf-token": "Fetch"
-        }
-
-    }, (error, response, body) => {
-
-        if (error) {
-            console.log(`Error by getting ${oDataURL.name}`);
-            reject(({
-                status: 500,
-                send: { error, response, body }
-            }))
-
-        } else if (response.statusCode == 200) {
-            csrfToken = response.headers['x-csrf-token'];
-            console.log(`Success getting ${oDataURL.name}`);
-
-            resolve({
-                status: 200,
-                send: {
-                    error,
-                    response,
-                    body: JSON.parse(body).d.results.map(resultRow => createObj(oDataURL.selections, resultRow))
-                }
-            })
-
-        } else if (response.statusCode == 401) {
-            console.log(`Error 401 by getting ${oDataURL.name}`);
-            reject(({
-                status: response.statusCode,
-                send: {
-                    error: "User does not have authorization or account locked due to incorrect logon attempts.",
-                    response,
-                    body,
-                },
-            }))
-        } else if (response.statusCode == 404) {
-            console.log(`Error 404 by getting ${oDataURL.name}`);
-            reject(({
-                status: response.statusCode,
-                send: {
-                    error: JSON.parse(body).error ? JSON.parse(body).error.message.value : "Bad request",
-                    response,
-                    body,
-                }
-            }))
-        } else {
-            console.log(`Error ${response.statusCode} by getting ${oDataURL.name}`);
-            reject(({
-                status: response.statusCode,
-                send: {
-                    error: "Error getting the data",
-                    response,
-                    body,
-                },
-            }))
-        }
-    });
-});
-
-module.exports = getBWData;
-```
-
-As a result this structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js):
+As a result the structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js):
 ```
 dimensions: {
     country: {
