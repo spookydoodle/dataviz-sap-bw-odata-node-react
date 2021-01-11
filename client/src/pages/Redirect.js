@@ -65,16 +65,13 @@ const useStyles = makeStyles((theme) =>
         container: {
             fontFamily: "Open Sans",
             textAlign: "center",
-            position: "relative",
-            width: "80%",
+            width: "90%",
             margin: "0 auto",
             '& div, p': {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 minHeight: "10em",
-                // width: "50%",
-                margin: ".5em 1em",
             }
         },
         glassMorphic: {
@@ -86,7 +83,8 @@ const useStyles = makeStyles((theme) =>
             border: "solid rgba(255, 255, 255, .18) 1.2px",
             borderRadius: "10px",
             boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
-            color: "white"
+            color: "white",
+            marginBottom: "1em",
         },
         title: {
             color: "#E1E5F2",
@@ -163,30 +161,28 @@ const Dashboard = ({ data }) => {
 
 
 
-            <Grid container direction="column" justify="center" alignItems="center" className={classes.container}>
+            <Grid container justify="space-evenly" className={classes.container}>
                     <Typography color="inherit" variant="h3" className={clsx(classes.title)}>
                         Click to see example viz setup
-                </Typography>
-                <Grid container justify="center" alignItems="center" >
-                    <Grid item xs={12} sm={5} className={classes.glassMorphic}>
+                    </Typography>
+                    <Grid item xs={10} sm={5} className={classes.glassMorphic}>
                         <a href="https://github.com/kxkaro/dataviz-sap-bw-odata-node-react" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                             🔭 Git repo backend 
-                </Typography>
+                        </Typography>
                         </a>
                     </Grid>
-                    <Grid item xs={12} sm={5} container direction="column" className={classes.glassMorphic}>
+                    <Grid item xs={10} sm={5} container direction="column" className={classes.glassMorphic}>
                         <a href="http://dataviz.kkx.rocks/" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 💖 Dashboard
-                </Typography>
+                        </Typography>
                         </a>
                         <a href="https://github.com/kxkaro/dataviz" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 📊 Git repo front-end
-                </Typography>
+                        </Typography>
                         </a>
-                    </Grid>
                 </Grid>
             </Grid>
         </div>
