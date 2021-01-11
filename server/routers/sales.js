@@ -45,7 +45,6 @@ routeDefinitions.forEach(async ({ path, name, BWoDataArr }, i) => {
 
     // Create Get request route
     router.get(`${baseUrl}${path}`, async (req, res) => {
-        const reqCattywampus = req.headers.cattywampus;
         const response = await getFromCache(resultsCache);
 
         res.status(response.status).send(response);

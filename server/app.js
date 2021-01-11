@@ -27,7 +27,6 @@ indexRouter.get('/', (req, res) => {
 indexRouter.use(config.baseUrl.health, healthRouter);
 
 // Sales routes used in the Retail Flash application - connect to SAP BW via oData
-// Data sources: FCP_U034 and FCP_U114
 indexRouter.use(config.baseUrl.api, salesRouter);
 
 // Configure router to be based on a path where it's deployed
