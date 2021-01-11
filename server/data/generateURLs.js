@@ -1,7 +1,7 @@
 const BWoData = require('./BWoData');
 const { formatToDateVar, getDateWithOffset } = require('../common/dates');
 const queryInfo = require('./mapping/queryInfo');
-const { server, port, credentials } = require('./system');
+const { server, port, credentials } = require('../constants/currentSystem');
 
 const yesterdayVar = formatToDateVar(getDateWithOffset(-1));
 

@@ -11,7 +11,7 @@
 // as class constructor parameters, and load a fresh update if conditions are met.
 // Otherwise it will provide the cached data to the client, preventing from
 // redundant requests from server to the data center (BW)
-import logSymbols from 'log-symbols';
+const logSymbols = require('log-symbols');
 
 class DataCache {
     constructor(
@@ -191,4 +191,4 @@ class DataCache {
     };
 }
 
-export default DataCache;
+module.exports = DataCache;

@@ -1,7 +1,6 @@
-import logSymbols from 'log-symbols';
-import { createObj } from './convertObj';
-import { systemName } from '../constants/currentSystem';
-import BWoData from './BWoData';
+const logSymbols = require('log-symbols');
+const { createObj } = require('./convertObj');
+const { systemName } = require('../constants/currentSystem');
 const fetch = require('node-fetch');
 const message =
     "This API is managed by hello world. Contact abc@def.com for more information.";
@@ -116,4 +115,4 @@ const getFromCache = (resultsCache) => resultsCache.getData()
     };
 });
 
-export { fetchOne, fetchAll, getFromCache };
+module.exports = { fetchOne, fetchAll, getFromCache };
