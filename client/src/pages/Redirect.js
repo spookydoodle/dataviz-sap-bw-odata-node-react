@@ -173,7 +173,7 @@ const Dashboard = ({ data }) => {
                         </a>
                     </Grid>
                     <Grid item xs={10} sm={5} container direction="column" className={classes.glassMorphic}>
-                        <a href="http://dataviz.kkx.rocks/" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                        <a href="https://dataviz-kx.surge.sh" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 💖 Dashboard
                         </Typography>
