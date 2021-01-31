@@ -1,23 +1,23 @@
 {
   "files": {
-    "main.css": "/dataviz-sap-bw-odata-node-react/static/css/main.5f361e03.chunk.css",
-    "main.js": "/dataviz-sap-bw-odata-node-react/static/js/main.f8e93784.chunk.js",
-    "main.js.map": "/dataviz-sap-bw-odata-node-react/static/js/main.f8e93784.chunk.js.map",
+    "main.css": "/dataviz-sap-bw-odata-node-react/static/css/main.523f09c5.chunk.css",
+    "main.js": "/dataviz-sap-bw-odata-node-react/static/js/main.2514af76.chunk.js",
+    "main.js.map": "/dataviz-sap-bw-odata-node-react/static/js/main.2514af76.chunk.js.map",
     "runtime-main.js": "/dataviz-sap-bw-odata-node-react/static/js/runtime-main.3f6b9ba7.js",
     "runtime-main.js.map": "/dataviz-sap-bw-odata-node-react/static/js/runtime-main.3f6b9ba7.js.map",
-    "static/js/2.2ec2193c.chunk.js": "/dataviz-sap-bw-odata-node-react/static/js/2.2ec2193c.chunk.js",
-    "static/js/2.2ec2193c.chunk.js.map": "/dataviz-sap-bw-odata-node-react/static/js/2.2ec2193c.chunk.js.map",
+    "static/js/2.e3c6b9cb.chunk.js": "/dataviz-sap-bw-odata-node-react/static/js/2.e3c6b9cb.chunk.js",
+    "static/js/2.e3c6b9cb.chunk.js.map": "/dataviz-sap-bw-odata-node-react/static/js/2.e3c6b9cb.chunk.js.map",
     "index.html": "/dataviz-sap-bw-odata-node-react/index.html",
-    "precache-manifest.742d220c29d36cda76be56a221af8f7a.js": "/dataviz-sap-bw-odata-node-react/precache-manifest.742d220c29d36cda76be56a221af8f7a.js",
+    "precache-manifest.a4a570ac3a0ddbe7976a112f5746a537.js": "/dataviz-sap-bw-odata-node-react/precache-manifest.a4a570ac3a0ddbe7976a112f5746a537.js",
     "service-worker.js": "/dataviz-sap-bw-odata-node-react/service-worker.js",
-    "static/css/main.5f361e03.chunk.css.map": "/dataviz-sap-bw-odata-node-react/static/css/main.5f361e03.chunk.css.map",
-    "static/js/2.2ec2193c.chunk.js.LICENSE.txt": "/dataviz-sap-bw-odata-node-react/static/js/2.2ec2193c.chunk.js.LICENSE.txt",
+    "static/css/main.523f09c5.chunk.css.map": "/dataviz-sap-bw-odata-node-react/static/css/main.523f09c5.chunk.css.map",
+    "static/js/2.e3c6b9cb.chunk.js.LICENSE.txt": "/dataviz-sap-bw-odata-node-react/static/js/2.e3c6b9cb.chunk.js.LICENSE.txt",
     "static/media/bg.jpg": "/dataviz-sap-bw-odata-node-react/static/media/bg.eb4bb880.jpg"
   },
   "entrypoints": [
     "static/js/runtime-main.3f6b9ba7.js",
-    "static/js/2.2ec2193c.chunk.js",
-    "static/css/main.5f361e03.chunk.css",
-    "static/js/main.f8e93784.chunk.js"
+    "static/js/2.e3c6b9cb.chunk.js",
+    "static/css/main.523f09c5.chunk.css",
+    "static/js/main.2514af76.chunk.js"
   ]
 }

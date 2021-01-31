@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/dataviz-sap-bw-odata-node-react/precache-manifest.742d220c29d36cda76be56a221af8f7a.js"
+  "/dataviz-sap-bw-odata-node-react/precache-manifest.a4a570ac3a0ddbe7976a112f5746a537.js"
 );
 
 self.addEventListener('message', (event) => {
