@@ -2,7 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://kxkaro.github.io/dataviz-sap-bw-odata-node-react/",
+  "homepage": "https://spookydoodle.github.io/dataviz-sap-bw-odata-node-react/",
   "proxy": "http://localhost:5000",
   "dependencies": {
     "@material-ui/core": "^4.10.1",
@@ -26,7 +26,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-image": "^4.0.3",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.1",
+    "typescript": "^4.1.3"
   },
   "scripts": {
     "start": "react-scripts start",

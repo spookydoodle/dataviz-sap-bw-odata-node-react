@@ -166,19 +166,19 @@ const Dashboard = ({ data }) => {
                         Click to see example viz setup
                     </Typography>
                     <Grid item xs={10} sm={5} className={classes.glassMorphic}>
-                        <a href="https://github.com/kxkaro/dataviz-sap-bw-odata-node-react" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                        <a href="https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                             🔭 Git repo backend 
                         </Typography>
                         </a>
                     </Grid>
                     <Grid item xs={10} sm={5} container direction="column" className={classes.glassMorphic}>
-                        <a href="https://dataviz-kx.surge.sh" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                        <a href="https://dataviz.spookydoodle.com" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 💖 Dashboard
                         </Typography>
                         </a>
-                        <a href="https://github.com/kxkaro/dataviz" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
+                        <a href="https://github.com/spookydoodle/dataviz" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 📊 Git repo front-end
                         </Typography>

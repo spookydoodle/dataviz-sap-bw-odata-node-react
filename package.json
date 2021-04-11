@@ -2,7 +2,7 @@
     "name": "dataviz-sap-bw-odata-node-express-react",
     "version": "1.0.0",
     "description": "",
-    "homepage": "https://kxkaro.github.io/dataviz-sap-bw-odata-node-react/",
+    "homepage": "https://spookydoodle.github.io/dataviz-sap-bw-odata-node-react/",
     "main": "index.js",
     "scripts": {
         "install-all": "yarn install && yarn --cwd client install && yarn --cwd server install",
