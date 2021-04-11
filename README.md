@@ -1,7 +1,7 @@
 # dataviz-sap-bw-odata-node-react
-A base for a data visualization application with server running on Node.js requesting data from backend SAP BW system and client built using React.js. View code on [this repository](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react). 
+A base for a data visualization application with server running on Node.js requesting data from backend SAP BW system and client built using React.js. View code on [this repository](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react). 
 
-See also [this repository](https://github.com/kxkaro/dataviz) and [this page](https://dataviz-kx.surge.sh) to view code for a cool data vizualization app using D3 and React.js
+See also [this repository](https://github.com/spookydoodle/dataviz) and [this page](https://dataviz-kx.surge.sh) to view code for a cool data vizualization app using D3 and React.js
 
 # Intro
 This document describes three steps required to build a web application on Node.js and React.js with the purpose of analysis and visualization of data sourced from a backend SAP Business Warehouse (BW) system.
@@ -458,9 +458,9 @@ Not all applications need constant communication with BW. Some dashboards show s
 * --**testing**
 
 ### Set up index and app
-[**index.js**](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/index.js)
+[**index.js**](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/index.js)
 
-The [`index.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/index.js) script should start the server and should be kept as simple as possible.
+The [`index.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/index.js) script should start the server and should be kept as simple as possible.
 
 ```
 const app = require('./app');
@@ -471,9 +471,9 @@ app.listen(PORT, () => {
 });
 ```
 
-[**app.js**](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js)
+[**app.js**](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/app.js)
 
-The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) file exposes the app as a library. Here we use the express framework.
+The [`app.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) file exposes the app as a library. Here we use the express framework.
 
 In the server folder, install *express*, *body-parser* and *request*. Also add *nodemon* globally and as a devdependency in order to automatically refresh the application after saving changes.
 
@@ -494,7 +494,7 @@ See `package.json` to view dependencies and add scripts.
 
 The application can be run by executing the `nodemon index.js` script. Before it is possible to do so, it is required to set up the `app.js` and routes.
 
-The [`app.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) initializes the express application and handles routes. Routers are stored in a separate folder and imported in the `app.js`.
+The [`app.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/app.js) initializes the express application and handles routes. Routers are stored in a separate folder and imported in the `app.js`.
 
 ```
 const express = require('express');
@@ -533,7 +533,7 @@ In BW, each object has usually a key and a text property, and each measure has a
 
 In order to restructure data, it is necessary to build a mapping file with query details and a list of expected dimensions and measures. Such file will also allow to keep all metadata in one place, which can be useful especially when the data source structure changes. There are often multiple objects for the same thing in BW and depending on the business use, it might be necessary at some point to use another technical name for the same object. Creation of a mapping file will allow us to do such change only in one place, instead of everywhere in our code. Also, thanks to the restructuring we will be able to access the data using standard JavaScript object names, instead of long technical names from BW. For example to get a *Country* name from the data we can simply refer to `results.country.text`, instead of `results[“A0COUNTRY_T”]`. Using strings everywhere in the code is generally evil.
 
-The [mapping file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) is located in [`server/data/mapping/queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) and contains details as seen below:
+The [mapping file](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) is located in [`server/data/mapping/queryInfo.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js) and contains details as seen below:
 
 ```
 const queryInfo = {
@@ -618,29 +618,29 @@ To access the data the application needs to be connected to the internal network
 **Solution 1** - One service user with one set of authorizations to communicate between backend SAP BW system and the web app.
 
 Use `process.env` to securely store credentials in the deployment environment. 
-See [`system.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/system.js)
+See [`system.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/system.js)
 
 **Solution 2** - Allow users to log in using an input form to use their BW authorizations.
 
 TODO: Add input forms to pass username and password and encode it using Base64 and pass to the server route with request
 
 ### oData URL manipulation class
-Select data using chainable methods of a class [`BWoData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/BWoData.js) which is defined in `server/data/`
+Select data using chainable methods of a class [`BWoData`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/BWoData.js) which is defined in `server/data/`
 
 Read [here](https://www.odata.org/documentation/odata-version-2-0/uri-conventions/) how you can make use of all oData URL parameters.
 
 ### Data Cache
-See [`DataCache.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/DataCache.js) from `server/data/`. For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
+See [`DataCache.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/DataCache.js) from `server/data/`. For static data, a small data cache method can be built. If there is no need to refresh the data each time a user opens the app, you can reduce the amount of traffic between the data center and the hosting platform and also speed up the loading time of all components which need data from BW.
 
 
 ### Routes
-See method [`getBWData.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which stores a general methods to fetch data from a BW query using oData and to save it in DataCache. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
+See method [`getBWData.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) from `server/data/` which stores a general methods to fetch data from a BW query using oData and to save it in DataCache. See [this blog post](https://www.acorel.nl/2016/12/consuming-sap-odata-services-from-angularjs-and-or-node-js/) for a demo presenting how to pull data to a node application using request. 
 
 This method reuses the structure from the `queryInfo.dimensions` and `queryInfo.measures` and replaces the technical names from BW, which were placed as values, with the actual values from the oData results. It should be used for all routes leading to SAP BW data.
 
 In the route file, which is directly used in the `app.js`, we can define the routes, and therefore selections, which we need for the client app. For example, we can create a get route `/api/sales/countries` which selects *Country*, *Quantity* and *Sales* amounts.
 
-See [`generateURLs.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/generateURLs.js) from `server/data/` to see how the oData queries are created.
+See [`generateURLs.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/generateURLs.js) from `server/data/` to see how the oData queries are created.
 
 If the same selections are available in two queries and you want to merge results in one request, you can pass both queries in the array in the third parameter of `getBWData`. they will be executed in a Promise.all() statement. 
 
@@ -701,10 +701,10 @@ router.get('/', (req, res) => {
 module.exports = router;
 ```
 
-See the definition of [`getBWData`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) method in `server/data`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/convertObj.js)
+See the definition of [`getBWData`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/getBWData.js) method in `server/data`, which handles several kinds of responses from the source system (bad request, authorization etc.) and transforms the output to the desired one using the helper method [createObj](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/convertObj.js)
 
 
-As a result the structure from the [`queryInfo.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js):
+As a result the structure from the [`queryInfo.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/server/data/mapping/queryInfo.js):
 ```
 dimensions: {
     country: {
@@ -819,7 +819,7 @@ Or with yarn:
 yarn add axios
 ```
 
-In the `client/src` folder, create a folder called *services* and add there a file corresponding to a route file from the server. In this demo app the fille is called [`salesService.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js).
+In the `client/src` folder, create a folder called *services* and add there a file corresponding to a route file from the server. In this demo app the fille is called [`salesService.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js).
 
 ```
 import axios from 'axios';
@@ -833,7 +833,7 @@ export default {
 ```
 
 ### Display results in the app
-To see that the data is passed from BW to server and from server to client, go to [`App.js`](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/App.js) and import the [service file](https://github.com/kxkaro/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js). Then add a simple code to display data.
+To see that the data is passed from BW to server and from server to client, go to [`App.js`](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/client/src/App.js) and import the [service file](https://github.com/spookydoodle/dataviz-sap-bw-odata-node-react/blob/master/client/src/services/salesService.js). Then add a simple code to display data.
 
 ```
 import React, { Component } from 'react';
@@ -879,4 +879,4 @@ And the app:
 <img src="public/images/client-app-result-1.png" width="250"/>
 
 ## D3 Data viz components
-See [this repository](https://github.com/kxkaro/dataviz) and [this page](https://kxkaro.github.io/dataviz) to view code for a cool data vizualization app using D3 and React.js
+See [this repository](https://github.com/spookydoodle/dataviz) and [this page](https://spookydoodle.github.io/dataviz) to view code for a cool data vizualization app using D3 and React.js
