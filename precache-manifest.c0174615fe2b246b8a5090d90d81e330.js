@@ -1,10 +1,10 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "3dada5fcdbcbc503bc9859438b4513e6",
+    "revision": "a38c57523141d2f359c5a6cda8e658ee",
     "url": "/dataviz-sap-bw-odata-node-react/index.html"
   },
   {
-    "revision": "1297219b6360e12a9f76",
+    "revision": "43c8f9cfb5a13af72d07",
     "url": "/dataviz-sap-bw-odata-node-react/static/css/main.523f09c5.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/dataviz-sap-bw-odata-node-react/static/js/2.e3c6b9cb.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "1297219b6360e12a9f76",
-    "url": "/dataviz-sap-bw-odata-node-react/static/js/main.ec01eedf.chunk.js"
+    "revision": "43c8f9cfb5a13af72d07",
+    "url": "/dataviz-sap-bw-odata-node-react/static/js/main.55bf1f6d.chunk.js"
   },
   {
     "revision": "0b9d7e75fb2cff3d2aea",
