@@ -173,11 +173,6 @@ const Dashboard = ({ data }) => {
                         </a>
                     </Grid>
                     <Grid item xs={10} sm={5} container direction="column" className={classes.glassMorphic}>
-                        <a href="https://dataviz.spookydoodle.com" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
-                            <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
-                                💖 Dashboard
-                        </Typography>
-                        </a>
                         <a href="https://github.com/spookydoodle/dataviz" target="_blank" rel="noopener noreferrer" className={classes.noUnderline}>
                             <Typography color="inherit" variant="h5" className={classes.linkUnderlineAnim}>
                                 📊 Git repo front-end
